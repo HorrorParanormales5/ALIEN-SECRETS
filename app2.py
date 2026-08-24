@@ -25,7 +25,7 @@ HTML_FILENAME = "UFOCS_con_mejoras_mas_actual.html"   # <-- cambia esto si tu ar
 # Si no existe en el entorno, usa por defecto la URL de Cloudflare especificada.
 OLLAMA_URL = os.environ.get(
     "OLLAMA_URL", 
-    "https://karen-reflect-sec-prospects.trycloudflare.com/api/chat"
+    "https://yard-major-rise-motel.trycloudflare.com/api/chat"
 )
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
