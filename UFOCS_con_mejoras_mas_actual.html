@@ -1,0 +1,2593 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UFOCS · Cybersecurity Virtual Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   UFOCS - Cybersecurity Virtual Agent
+   Hoja de estilos (todo en un solo archivo)
+   ============================================================ */
+
+:root {
+    --bg-edge: #202226;
+    --bg-center: #4a4d53;
+    --panel-bg: #17181b;
+    --input-bg: #14201a;
+    --input-border: #2d5b3f;
+    --input-border-focus: #34d67a;
+    --green: #34d67a;
+    --green-bright: #4ee892;
+    --green-dark: #1c6b41;
+    --green-dark-hover: #23864f;
+    --text-main: #eef1ef;
+    --text-muted: #9aa1a0;
+    --text-faint: #6b716f;
+    --danger: #ff5c5c;
+    --radius: 8px;
+    --font-display: 'Poppins', 'Segoe UI', sans-serif;
+    --font-body: 'Inter', 'Segoe UI', sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    font-family: var(--font-body);
+    color: var(--text-main);
+    background: radial-gradient(ellipse at center, var(--bg-center) 0%, var(--bg-edge) 75%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+/* ============================================================
+   PANTALLAS (SPA: solo una visible a la vez)
+   ============================================================ */
+.screen { display: none; width: 100%; justify-content: center; }
+.screen.active { display: flex; }
+
+/* ============================================================
+   TARJETA / CONTENEDOR CENTRAL
+   ============================================================ */
+.auth-card {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeInUp 0.4s ease;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   LOGO
+   ============================================================ */
+.brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 28px;
+}
+
+.brand-logo {
+    width: 192px;
+    height: 192px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 18px rgba(52, 214, 122, 0.45));
+    margin-bottom: 14px;
+}
+
+.brand-name {
+    font-family: var(--font-display);
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    line-height: 1;
+    margin: 0;
+}
+
+.brand-name .accent { color: var(--green); }
+.brand-name .rest { color: var(--text-main); }
+
+.brand-tagline {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    letter-spacing: 0.3px;
+}
+
+/* ============================================================
+   FORMULARIO
+   ============================================================ */
+.auth-form { width: 100%; }
+
+.field { margin-bottom: 18px; }
+
+.field label {
+    display: block;
+    font-size: 13px;
+    color: var(--text-main);
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius);
+    padding: 0 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-wrap:focus-within {
+    border-color: var(--input-border-focus);
+    box-shadow: 0 0 0 3px rgba(52, 214, 122, 0.15);
+}
+
+.input-wrap svg { flex-shrink: 0; color: var(--green); margin-right: 10px; }
+
+.input-wrap input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 14px;
+    padding: 13px 0;
+}
+
+.input-wrap input::placeholder { color: var(--text-faint); }
+
+.input-wrap .toggle-visibility {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-faint);
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    margin-left: 6px;
+    transition: color 0.15s ease;
+}
+
+.input-wrap .toggle-visibility:hover { color: var(--green); }
+
+.strength-bar {
+    height: 2px;
+    background: var(--input-border);
+    border-radius: 2px;
+    margin-top: 6px;
+    overflow: hidden;
+}
+
+.strength-bar-fill {
+    height: 100%;
+    width: 35%;
+    background: linear-gradient(90deg, var(--green-dark), var(--green));
+    transition: width 0.25s ease, background 0.25s ease;
+}
+
+/* ============================================================
+   BOTONES
+   ============================================================ */
+.btn-primary {
+    width: 100%;
+    padding: 13px 0;
+    background: var(--green-dark);
+    border: 1px solid var(--green);
+    border-radius: var(--radius);
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.08s ease, box-shadow 0.2s ease;
+    margin-top: 4px;
+}
+
+.btn-primary:hover { background: var(--green-dark-hover); box-shadow: 0 0 18px rgba(52, 214, 122, 0.3); }
+.btn-primary:active { transform: scale(0.99); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btn-secondary {
+    width: 100%;
+    padding: 12px 0;
+    background: transparent;
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius);
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.btn-secondary:hover { border-color: var(--green); background: rgba(52, 214, 122, 0.06); }
+
+/* ============================================================
+   ENLACES
+   ============================================================ */
+.auth-links {
+    margin-top: 18px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.auth-links a, .auth-links button.link-btn {
+    color: var(--text-muted);
+    font-size: 13px;
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: color 0.15s ease;
+}
+
+.auth-links a:hover, .auth-links button.link-btn:hover { color: var(--green); }
+
+/* ============================================================
+   PIE DE PÁGINA (créditos)
+   ============================================================ */
+.auth-footer {
+    margin-top: 26px;
+    text-align: center;
+    font-size: 11.5px;
+    color: var(--text-faint);
+    letter-spacing: 0.2px;
+    line-height: 1.6;
+}
+.auth-footer .footer-brand { color: var(--green); font-weight: 600; }
+
+/* ============================================================
+   MENSAJES DE ESTADO
+   ============================================================ */
+.form-message {
+    display: none;
+    font-size: 13px;
+    padding: 10px 12px;
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    text-align: center;
+    animation: fadeInUp 0.25s ease;
+}
+
+.form-message.show { display: block; }
+
+.form-message.error {
+    background: rgba(255, 92, 92, 0.1);
+    border: 1px solid rgba(255, 92, 92, 0.4);
+    color: var(--danger);
+}
+
+.form-message.success {
+    background: rgba(52, 214, 122, 0.1);
+    border: 1px solid rgba(52, 214, 122, 0.4);
+    color: var(--green-bright);
+}
+
+/* ============================================================
+   PANTALLA DE TRANSICIÓN (circuitos + logo parpadeante)
+   ============================================================ */
+#screen-transition {
+    background: radial-gradient(ellipse at center, var(--bg-center) 0%, var(--bg-edge) 75%);
+}
+.transition-stage {
+    position: relative;
+    width: clamp(260px, 60vw, 400px);
+    height: clamp(260px, 60vw, 400px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.circuit-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+}
+.circuit-svg .trace {
+    fill: none;
+    stroke: var(--green);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 7 5;
+    opacity: 0.15;
+    animation: traceFlow 1.4s linear infinite, tracePulse 1.6s ease-in-out infinite;
+}
+.circuit-svg .node {
+    fill: var(--green);
+    opacity: 0.2;
+    animation: nodePulse 1.6s ease-in-out infinite;
+}
+@keyframes traceFlow { to { stroke-dashoffset: -24; } }
+@keyframes tracePulse {
+    0%, 100% { opacity: 0.15; }
+    50% { opacity: 1; filter: drop-shadow(0 0 4px var(--green)); }
+}
+@keyframes nodePulse {
+    0%, 100% { opacity: 0.2; filter: drop-shadow(0 0 0px var(--green)); }
+    50% { opacity: 1; filter: drop-shadow(0 0 6px var(--green)); }
+}
+.circuit-svg .trace:nth-of-type(1) { animation-delay: 0s, 0s; }
+.circuit-svg .trace:nth-of-type(2) { animation-delay: -0.2s, 0.15s; }
+.circuit-svg .trace:nth-of-type(3) { animation-delay: -0.4s, 0.3s; }
+.circuit-svg .trace:nth-of-type(4) { animation-delay: -0.6s, 0.45s; }
+.circuit-svg .trace:nth-of-type(5) { animation-delay: -0.8s, 0.6s; }
+.circuit-svg .trace:nth-of-type(6) { animation-delay: -1.0s, 0.75s; }
+.circuit-svg .trace:nth-of-type(7) { animation-delay: -1.2s, 0.9s; }
+.circuit-svg .trace:nth-of-type(8) { animation-delay: -1.4s, 1.05s; }
+.circuit-svg .node:nth-of-type(1) { animation-delay: 0.15s; }
+.circuit-svg .node:nth-of-type(2) { animation-delay: 0.3s; }
+.circuit-svg .node:nth-of-type(3) { animation-delay: 0.45s; }
+.circuit-svg .node:nth-of-type(4) { animation-delay: 0.6s; }
+.circuit-svg .node:nth-of-type(5) { animation-delay: 0.75s; }
+.circuit-svg .node:nth-of-type(6) { animation-delay: 0.9s; }
+.circuit-svg .node:nth-of-type(7) { animation-delay: 1.05s; }
+.circuit-svg .node:nth-of-type(8) { animation-delay: 1.2s; }
+
+.transition-logo {
+    position: relative;
+    z-index: 2;
+    width: clamp(120px, 30vw, 180px);
+    height: clamp(120px, 30vw, 180px);
+    object-fit: contain;
+    animation: logoOutlineBlink 0.9s ease-in-out infinite;
+}
+@keyframes logoOutlineBlink {
+    0%, 100% {
+        filter: drop-shadow(0 0 2px rgba(52,214,122,0.25)) drop-shadow(0 0 6px rgba(52,214,122,0.15));
+    }
+    50% {
+        filter: drop-shadow(0 0 16px rgba(52,214,122,0.95)) drop-shadow(0 0 32px rgba(52,214,122,0.6));
+    }
+}
+.transition-text {
+    margin-top: 26px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    animation: textFlicker 1.6s ease-in-out infinite;
+}
+@keyframes textFlicker { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+.screen.fade-out { animation: screenFadeOut 0.5s ease forwards; }
+@keyframes screenFadeOut { to { opacity: 0; } }
+.screen.fade-in { animation: screenFadeIn 0.5s ease; }
+@keyframes screenFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ============================================================
+   FONDO DE NÚMEROS BINARIOS (detrás del chat)
+   ============================================================ */
+#binary-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    background: var(--bg-edge);
+    display: none;
+}
+#binary-bg.active { display: block; }
+#binary-bg .bit {
+    position: absolute;
+    font-family: 'Courier New', ui-monospace, monospace;
+    color: var(--green);
+    opacity: 0.08;
+    text-shadow: none;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.25s ease, text-shadow 0.25s ease;
+    user-select: none;
+    will-change: opacity;
+}
+#binary-bg .bit.bit-on {
+    opacity: 1;
+    color: var(--green-bright);
+    text-shadow: 0 0 6px rgba(78, 232, 146, 0.9), 0 0 14px rgba(52, 214, 122, 0.6);
+}
+#screen-chat { position: relative; z-index: 1; }
+
+/* ============================================================
+   PANTALLA DE CHAT (agente virtual UFOCS)
+   ============================================================ */
+#screen-chat { padding: 0; align-items: stretch; }
+.chat-wrapper {
+    width: 100%;
+    max-width: 720px;
+    height: 88vh;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    background: var(--panel-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+}
+.chat-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--input-border);
+    background: rgba(255,255,255,0.02);
+}
+.chat-header-logo { width: 40px; height: 40px; object-fit: contain; filter: drop-shadow(0 0 6px rgba(52,214,122,0.35)); }
+.chat-header-title { font-family: var(--font-display); font-weight: 700; color: var(--text-main); font-size: 16px; line-height: 1.2; }
+.chat-header-sub { color: var(--text-muted); font-size: 12px; }
+
+.chat-header-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.icon-btn {
+    background: transparent;
+    border: 1px solid var(--input-border);
+    color: var(--text-muted);
+    width: 36px; height: 36px;
+    border-radius: 9px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+    flex-shrink: 0;
+}
+.icon-btn:hover { border-color: var(--green); color: var(--green); background: rgba(52,214,122,0.08); }
+.icon-btn:active { transform: scale(0.94); }
+.icon-btn.danger-hover:hover { border-color: var(--danger); color: var(--danger); background: rgba(255,92,92,0.08); }
+.chat-logout-btn { /* alias legado, mismo look que icon-btn */
+    background: transparent;
+    border: 1px solid var(--input-border);
+    color: var(--text-muted);
+    width: 36px; height: 36px;
+    border-radius: 9px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+.chat-logout-btn:hover { border-color: var(--danger); color: var(--danger); background: rgba(255,92,92,0.08); }
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.chat-bubble {
+    max-width: 78%;
+    padding: 12px 15px;
+    border-radius: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    animation: fadeInUp 0.25s ease;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+}
+.chat-bubble.user {
+    align-self: flex-end;
+    background: linear-gradient(135deg, var(--green-dark), #175634);
+    border: 1px solid var(--green);
+    color: var(--text-main);
+    border-bottom-right-radius: 4px;
+}
+.chat-bubble.assistant {
+    align-self: flex-start;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    color: var(--text-main);
+    border-bottom-left-radius: 4px;
+}
+.chat-bubble.error { border-color: rgba(255,92,92,0.5); color: var(--danger); }
+
+/* Barra de scroll más discreta y moderna dentro del chat */
+.chat-messages::-webkit-scrollbar { width: 7px; }
+.chat-messages::-webkit-scrollbar-track { background: transparent; }
+.chat-messages::-webkit-scrollbar-thumb { background: var(--input-border); border-radius: 10px; }
+.chat-messages::-webkit-scrollbar-thumb:hover { background: var(--green-dark); }
+
+.typing-bubble { display: flex; gap: 4px; align-items: center; padding: 14px 16px; }
+.typing-bubble span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green);
+    animation: typingBounce 1s ease-in-out infinite;
+}
+.typing-bubble span:nth-child(2) { animation-delay: 0.15s; }
+.typing-bubble span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes typingBounce { 0%, 60%, 100% { transform: translateY(0); opacity: 0.5; } 30% { transform: translateY(-5px); opacity: 1; } }
+
+.chat-input-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border-top: 1px solid var(--input-border);
+    background: rgba(255,255,255,0.02);
+}
+.chat-avatar {
+    width: 38px; height: 38px;
+    object-fit: contain;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 4px rgba(52,214,122,0.3));
+    transition: filter 0.3s ease;
+}
+.chat-avatar.thinking {
+    animation: avatarBreathe 1.1s ease-in-out infinite, avatarBlink 0.9s ease-in-out infinite;
+}
+@keyframes avatarBreathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+@keyframes avatarBlink {
+    0%, 100% { filter: drop-shadow(0 0 3px rgba(52,214,122,0.3)); opacity: 0.75; }
+    50% { filter: drop-shadow(0 0 14px rgba(52,214,122,0.95)); opacity: 1; }
+}
+.chat-input-bar input {
+    flex: 1;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 999px;
+    padding: 11px 16px;
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.chat-input-bar input:focus { border-color: var(--input-border-focus); box-shadow: 0 0 0 3px rgba(52,214,122,0.15); }
+.chat-input-bar input::placeholder { color: var(--text-faint); }
+.chat-send-btn {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--green-dark);
+    border: 1px solid var(--green);
+    color: var(--text-main);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+.chat-send-btn:hover { background: var(--green-dark-hover); box-shadow: 0 0 14px rgba(52,214,122,0.35); }
+.chat-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.chat-stop-btn {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: rgba(255,92,92,0.12);
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s ease;
+}
+.chat-stop-btn:hover { background: rgba(255,92,92,0.22); }
+
+/* ---------- Botón "+" adjuntar y su menú ---------- */
+.attach-btn {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: transparent;
+    border: 1px solid var(--input-border);
+    color: var(--green);
+    line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+.attach-btn:hover { border-color: var(--green); background: rgba(52,214,122,0.08); }
+.attach-btn.open { transform: rotate(45deg); border-color: var(--green); }
+.attach-menu {
+    position: absolute;
+    bottom: 56px;
+    left: 0;
+    background: var(--panel-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 10px;
+    padding: 6px;
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 190px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    z-index: 5;
+}
+.attach-menu.open { display: flex; }
+.attach-menu button {
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    text-align: left;
+    padding: 9px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 8px;
+}
+.attach-menu button:hover { background: rgba(52,214,122,0.1); color: var(--green); }
+.attach-preview-bar { display: none; padding: 0 16px; }
+.attach-preview-bar.active { display: block; padding-top: 10px; }
+.attach-chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 999px;
+    padding: 5px 10px 5px 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+    max-width: 100%;
+}
+.attach-chip-thumb { width: 24px; height: 24px; border-radius: 5px; object-fit: cover; }
+.attach-chip-remove {
+    background: transparent; border: none; color: var(--text-faint);
+    cursor: pointer; font-size: 13px; padding: 0 2px;
+}
+.attach-chip-remove:hover { color: var(--danger); }
+.chat-bubble-image { max-width: 220px; border-radius: 8px; display: block; margin-bottom: 6px; }
+
+/* ---------- Modal de cámara ---------- */
+#cameraModal {
+    position: fixed; inset: 0; z-index: 50;
+    background: rgba(0,0,0,0.85);
+    display: none; align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px; padding: 20px;
+}
+#cameraModal.active { display: flex; }
+#cameraVideo { width: 100%; max-width: 460px; border-radius: 10px; background: #000; }
+.camera-controls { display: flex; gap: 14px; }
+.camera-controls button {
+    padding: 10px 18px; border-radius: 999px; cursor: pointer;
+    font-size: 14px; border: 1px solid var(--input-border);
+    background: var(--input-bg); color: var(--text-main);
+}
+.camera-controls button.capture { background: var(--green-dark); border-color: var(--green); }
+.camera-controls button.capture:hover { background: var(--green-dark-hover); }
+
+/* ---------- Tabs superiores del chat ---------- */
+.chat-tabs {
+    display: flex; gap: 4px;
+    padding: 8px 16px 0;
+    border-bottom: 1px solid var(--input-border);
+    background: rgba(255,255,255,0.02);
+}
+.chat-tab {
+    background: transparent; border: none;
+    color: var(--text-muted);
+    padding: 9px 14px;
+    font-size: 13px; font-family: var(--font-body);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
+    display: inline-flex; align-items: center; gap: 7px;
+}
+.chat-tab svg { flex-shrink: 0; }
+.chat-tab:hover { color: var(--text-main); }
+.chat-tab.active { color: var(--green); border-bottom-color: var(--green); }
+
+/* ---------- Panel deslizante: historial de chats ---------- */
+.chat-history-overlay {
+    position: absolute; inset: 0; z-index: 24;
+    background: rgba(0,0,0,0.45);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+.chat-history-overlay.active { opacity: 1; pointer-events: auto; }
+.chat-history-panel {
+    position: absolute; top: 0; left: 0; bottom: 0; z-index: 25;
+    width: 270px; max-width: 82%;
+    background: var(--panel-bg);
+    border-right: 1px solid var(--input-border);
+    display: flex; flex-direction: column;
+    transform: translateX(-100%);
+    transition: transform 0.22s ease;
+    box-shadow: 8px 0 24px rgba(0,0,0,0.35);
+}
+.chat-history-panel.open { transform: translateX(0); }
+.chat-history-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 14px 10px;
+    border-bottom: 1px solid var(--input-border);
+}
+.chat-history-header h4 { margin: 0; font-size: 14px; color: var(--text-main); font-family: var(--font-display); }
+.new-chat-btn {
+    display: flex; align-items: center; gap: 8px;
+    margin: 12px 14px;
+    background: var(--green-dark);
+    border: 1px solid var(--green);
+    color: var(--text-main);
+    border-radius: 9px;
+    padding: 9px 12px;
+    font-size: 13px; font-family: var(--font-body); font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+.new-chat-btn:hover { background: var(--green-dark-hover); }
+.chat-sessions-list {
+    flex: 1; overflow-y: auto;
+    padding: 0 8px 12px;
+    display: flex; flex-direction: column; gap: 4px;
+}
+.chat-session-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+.chat-session-item:hover { background: rgba(255,255,255,0.04); }
+.chat-session-item.active { background: rgba(52,214,122,0.1); border-color: var(--green); }
+.chat-session-title {
+    flex: 1; font-size: 13px; color: var(--text-main);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.chat-session-delete {
+    background: transparent; border: none; color: var(--text-faint);
+    width: 26px; height: 26px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0;
+    transition: color 0.15s ease, background 0.15s ease;
+}
+.chat-session-delete:hover { color: var(--danger); background: rgba(255,92,92,0.1); }
+.chat-history-empty { padding: 24px 14px; text-align: center; color: var(--text-faint); font-size: 12.5px; }
+
+/* ---------- Panel: Settings (elegir modelo) ---------- */
+.settings-panel {
+    position: absolute; top: 0; right: 0; bottom: 0; z-index: 25;
+    width: 290px; max-width: 86%;
+    background: var(--panel-bg);
+    border-left: 1px solid var(--input-border);
+    display: flex; flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.22s ease;
+    box-shadow: -8px 0 24px rgba(0,0,0,0.35);
+}
+.settings-panel.open { transform: translateX(0); }
+.settings-body { padding: 16px 14px; display: flex; flex-direction: column; gap: 16px; }
+.model-switch-card {
+    background: var(--input-bg); border: 1px solid var(--input-border);
+    border-radius: 12px; padding: 14px;
+}
+.model-switch-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.model-switch-label { font-size: 13.5px; color: var(--text-main); font-weight: 600; font-family: var(--font-display); }
+.model-switch-desc { font-size: 11.5px; color: var(--text-muted); margin-top: 4px; line-height: 1.45; }
+.model-switch-endpoints { display: flex; justify-content: space-between; margin-top: 12px; font-size: 10.5px; color: var(--text-faint); }
+.model-switch-status { margin-top: 8px; font-size: 11px; color: var(--green); font-family: monospace; }
+
+.toggle-switch { position: relative; width: 46px; height: 26px; flex-shrink: 0; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-slider {
+    position: absolute; inset: 0; cursor: pointer;
+    background: rgba(255,255,255,0.15); border-radius: 999px;
+    transition: background 0.2s ease;
+}
+.toggle-slider::before {
+    content: ""; position: absolute; height: 20px; width: 20px; left: 3px; top: 3px;
+    background: #fff; border-radius: 50%; transition: transform 0.2s ease;
+}
+.toggle-switch input:checked + .toggle-slider { background: var(--green); }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+
+.icon-btn-sm {
+    background: transparent; border: none; color: var(--text-faint);
+    cursor: pointer; width: 26px; height: 26px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+}
+.icon-btn-sm:hover { color: var(--text-main); background: rgba(255,255,255,0.06); }
+
+/* ---------- Vista de Alerts (lista + detalle en split) ---------- */
+.chat-wrapper.wide-mode { max-width: 1100px; }
+.alerts-body { flex: 1; display: none; overflow: hidden; }
+.alerts-body.active { display: flex; }
+.alerts-list-col {
+    width: 100%;
+    display: flex; flex-direction: column;
+    border-right: 1px solid var(--input-border);
+    transition: width 0.2s ease;
+    overflow-y: auto;
+}
+.alerts-body.split .alerts-list-col { width: 40%; min-width: 240px; }
+.alert-detail-col {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 18px 20px 24px;
+}
+.alerts-body.split .alert-detail-col { display: flex; }
+.alerts-list-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 16px 10px;
+}
+.alerts-list-header h3 { font-size: 15px; color: var(--text-main); margin: 0; }
+.alerts-list-header button {
+    background: var(--green-dark); border: 1px solid var(--green);
+    color: var(--text-main); border-radius: 8px;
+    padding: 6px 10px; font-size: 12px; cursor: pointer;
+}
+.alerts-list-header button:hover { background: var(--green-dark-hover); }
+.alerts-scope-tabs { display: flex; gap: 6px; padding: 0 16px 10px; }
+.scope-tab {
+    background: transparent; border: 1px solid var(--input-border);
+    color: var(--text-muted); border-radius: 999px;
+    padding: 5px 12px; font-size: 12px; cursor: pointer;
+}
+.scope-tab.active { color: var(--green); border-color: var(--green); background: rgba(52,214,122,0.08); }
+.alerts-list-items { padding: 0 10px 16px; display: flex; flex-direction: column; gap: 6px; }
+.alert-list-item {
+    background: var(--input-bg); border: 1px solid var(--input-border);
+    border-radius: 8px; padding: 10px 12px; cursor: pointer;
+    transition: border-color 0.15s ease;
+}
+.alert-list-item:hover { border-color: var(--green); }
+.alert-list-item.selected { border-color: var(--green); background: rgba(52,214,122,0.08); }
+.alert-list-item .alert-name { font-size: 13px; color: var(--text-main); font-weight: 600; }
+.alert-list-item .alert-meta { font-size: 11px; color: var(--text-faint); margin-top: 3px; }
+.alerts-empty { padding: 30px 16px; text-align: center; color: var(--text-faint); font-size: 13px; }
+
+.alert-detail-header {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    margin-bottom: 14px;
+}
+.alert-detail-header input.alert-name-input {
+    background: transparent; border: none; border-bottom: 1px solid var(--input-border);
+    color: var(--text-main); font-size: 16px; font-family: var(--font-display);
+    padding: 4px 2px; flex: 1; outline: none;
+}
+.alert-detail-header input.alert-name-input:focus { border-color: var(--green); }
+.alert-detail-close {
+    background: transparent; border: 1px solid var(--input-border); color: var(--text-muted);
+    width: 30px; height: 30px; border-radius: 7px; cursor: pointer; flex-shrink: 0;
+}
+.alert-detail-close:hover { border-color: var(--danger); color: var(--danger); }
+.alert-field { margin-bottom: 16px; }
+.alert-field label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 5px; }
+.alert-field textarea {
+    width: 100%; min-height: 90px; resize: vertical;
+    background: var(--input-bg); border: 1px solid var(--input-border);
+    border-radius: 8px; padding: 10px 12px; color: var(--text-main);
+    font-family: var(--font-body); font-size: 13px; line-height: 1.5;
+    outline: none; box-sizing: border-box;
+}
+.alert-field textarea:focus { border-color: var(--input-border-focus); }
+.alert-field .char-count { font-size: 11px; color: var(--text-faint); text-align: right; margin-top: 3px; }
+.alert-detail-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; }
+.alert-save-btn {
+    background: var(--green-dark); border: 1px solid var(--green); color: var(--text-main);
+    border-radius: 8px; padding: 9px 18px; font-size: 13px; cursor: pointer;
+}
+.alert-save-btn:hover { background: var(--green-dark-hover); }
+.alert-delete-btn {
+    background: transparent; border: 1px solid rgba(255,92,92,0.4); color: var(--danger);
+    border-radius: 8px; padding: 9px 14px; font-size: 13px; cursor: pointer;
+}
+.alert-delete-btn:hover { background: rgba(255,92,92,0.08); }
+
+/* ---------- Modal: elegir dónde guardar la alerta ---------- */
+.scope-modal-overlay {
+    position: fixed; inset: 0; z-index: 60;
+    background: rgba(0,0,0,0.6);
+    display: none; align-items: center; justify-content: center;
+}
+.scope-modal-overlay.active { display: flex; }
+.scope-modal {
+    background: var(--panel-bg); border: 1px solid var(--input-border);
+    border-radius: 12px; padding: 20px; width: 320px; max-width: 90vw;
+}
+.scope-modal h4 { margin: 0 0 6px; color: var(--text-main); font-size: 15px; }
+.scope-modal p { margin: 0 0 16px; color: var(--text-muted); font-size: 12px; }
+.scope-modal-options { display: flex; flex-direction: column; gap: 8px; }
+.scope-modal-options button {
+    background: var(--input-bg); border: 1px solid var(--input-border);
+    color: var(--text-main); border-radius: 8px; padding: 10px 12px;
+    font-size: 13px; text-align: left; cursor: pointer;
+}
+.scope-modal-options button:hover { border-color: var(--green); }
+.scope-modal-options button small { display: block; color: var(--text-faint); font-size: 11px; margin-top: 2px; }
+.scope-modal-cancel {
+    margin-top: 12px; width: 100%; background: transparent; border: none;
+    color: var(--text-faint); font-size: 12px; cursor: pointer; padding: 6px;
+}
+
+@media (max-width: 480px) {
+    .chat-wrapper { height: 92vh; border-radius: 10px; }
+    .chat-bubble { max-width: 88%; }
+    .alerts-body.split { flex-direction: column; }
+    .alerts-body.split .alerts-list-col { width: 100%; max-height: 40%; border-right: none; border-bottom: 1px solid var(--input-border); }
+    .alerts-body.split .alert-detail-col { padding: 14px; }
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 480px) {
+    .brand-logo { width: 140px; height: 140px; }
+    .brand-name { font-size: 32px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+
+<!-- ============================================================
+     PANTALLA: LOGIN
+============================================================ -->
+<section class="screen active" id="screen-login">
+    <div class="auth-card">
+        <div class="brand">
+            <img class="brand-logo"
+                 src="https://raw.githubusercontent.com/HorrorParanormales5/ALIEN-SECRETS/main/LOGO%20OFICIAL.png"
+                 alt="UFOCS logo">
+            <p class="brand-tagline">Cybersecurity Virtual Agent</p>
+        </div>
+
+        <div class="form-message" id="loginMessage"></div>
+
+        <form class="auth-form" id="loginForm" autocomplete="off">
+            <div class="field">
+                <label for="loginUsername">Usuario</label>
+                <div class="input-wrap">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <input type="text" id="loginUsername" placeholder="Ingrese usuario" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="loginPassword">Contraseña</label>
+                <div class="input-wrap">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <input type="password" id="loginPassword" placeholder="Ingrese contraseña" required>
+                    <button type="button" class="toggle-visibility" aria-label="Mostrar contraseña">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+                <div class="strength-bar"><div class="strength-bar-fill"></div></div>
+            </div>
+
+            <button type="submit" class="btn-primary" id="loginSubmitBtn">Ingresar</button>
+        </form>
+
+        <div class="auth-links">
+            <a href="#" data-goto="forgot">¿Olvidó su contraseña?</a>
+            <a href="#" data-goto="register">Crear una cuenta</a>
+        </div>
+
+        <div class="auth-footer">
+            Todos los derechos reservados.<br>
+            AI creada por <span class="footer-brand">Gibrann Abdala</span>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+     PANTALLA: REGISTRO
+============================================================ -->
+<section class="screen" id="screen-register">
+    <div class="auth-card">
+        <div class="brand">
+            <img class="brand-logo"
+                 src="https://raw.githubusercontent.com/HorrorParanormales5/ALIEN-SECRETS/main/LOGO%20OFICIAL.png"
+                 alt="UFOCS logo">
+            <h1 class="brand-name"><span class="accent">UF</span><span class="rest">OCS</span></h1>
+            <p class="brand-tagline">Crear una cuenta nueva</p>
+        </div>
+
+        <div class="form-message" id="registerMessage"></div>
+
+        <form class="auth-form" id="registerForm" autocomplete="off">
+            <div class="field">
+                <label for="regUsername">Usuario</label>
+                <div class="input-wrap">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <input type="text" id="regUsername" placeholder="Elige un usuario" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="regPassword">Contraseña</label>
+                <div class="input-wrap">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <input type="password" id="regPassword" placeholder="Mínimo 6 caracteres" required>
+                    <button type="button" class="toggle-visibility" aria-label="Mostrar contraseña">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+                <div class="strength-bar"><div class="strength-bar-fill" id="regStrengthFill"></div></div>
+            </div>
+
+            <div class="field">
+                <label for="regConfirm">Confirmar contraseña</label>
+                <div class="input-wrap">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <input type="password" id="regConfirm" placeholder="Repite la contraseña" required>
+                    <button type="button" class="toggle-visibility" aria-label="Mostrar contraseña">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary" id="registerSubmitBtn">Crear cuenta</button>
+        </form>
+
+        <div class="auth-links">
+            <a href="#" data-goto="login">Ya tengo una cuenta · Iniciar sesión</a>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+     PANTALLA: RECUPERAR CONTRASEÑA
+============================================================ -->
+<section class="screen" id="screen-forgot">
+    <div class="auth-card">
+        <div class="brand">
+            <img class="brand-logo"
+                 src="https://raw.githubusercontent.com/HorrorParanormales5/ALIEN-SECRETS/main/LOGO%20OFICIAL.png"
+                 alt="UFOCS logo">
+            <h1 class="brand-name"><span class="accent">UF</span><span class="rest">OCS</span></h1>
+            <p class="brand-tagline">Recuperar contraseña</p>
+        </div>
+
+        <div class="form-message" id="forgotMessage"></div>
+
+        <form class="auth-form" id="forgotForm" autocomplete="off">
+            <div class="field">
+                <label for="forgotUsername">Usuario</label>
+                <div class="input-wrap">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <input type="text" id="forgotUsername" placeholder="Ingrese su usuario" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary" id="forgotSubmitBtn">Enviar instrucciones</button>
+        </form>
+
+        <div class="auth-links">
+            <a href="#" data-goto="login">Volver a iniciar sesión</a>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+     PANTALLA: TRANSICIÓN (efecto de circuitos encendiéndose)
+============================================================ -->
+<section class="screen" id="screen-transition">
+    <div style="display:flex; flex-direction:column; align-items:center;">
+        <div class="transition-stage">
+            <svg class="circuit-svg" viewBox="0 0 400 400">
+                <path class="trace" d="M200,110 L200,50 L290,50"></path>
+                <path class="trace" d="M200,110 L200,50 L110,50"></path>
+                <path class="trace" d="M290,200 L350,200 L350,110"></path>
+                <path class="trace" d="M290,200 L350,200 L350,290"></path>
+                <path class="trace" d="M200,290 L200,350 L110,350"></path>
+                <path class="trace" d="M200,290 L200,350 L290,350"></path>
+                <path class="trace" d="M110,200 L50,200 L50,110"></path>
+                <path class="trace" d="M110,200 L50,200 L50,290"></path>
+                <circle class="node" cx="290" cy="50" r="5"></circle>
+                <circle class="node" cx="110" cy="50" r="5"></circle>
+                <circle class="node" cx="350" cy="110" r="5"></circle>
+                <circle class="node" cx="350" cy="290" r="5"></circle>
+                <circle class="node" cx="110" cy="350" r="5"></circle>
+                <circle class="node" cx="290" cy="350" r="5"></circle>
+                <circle class="node" cx="50" cy="110" r="5"></circle>
+                <circle class="node" cx="50" cy="290" r="5"></circle>
+            </svg>
+            <img class="transition-logo"
+                 src="https://raw.githubusercontent.com/HorrorParanormales5/ALIEN-SECRETS/main/LOGO%20OFICIAL.png"
+                 alt="UFOCS logo">
+        </div>
+        <div class="transition-text">Iniciando sistema UFOCS...</div>
+    </div>
+</section>
+
+<!-- ============================================================
+     FONDO ANIMADO DE NÚMEROS BINARIOS (solo visible detrás del chat)
+============================================================ -->
+<div id="binary-bg"></div>
+
+<!-- ============================================================
+     PANTALLA: CHAT (agente virtual UFOCS)
+============================================================ -->
+<section class="screen" id="screen-chat">
+    <div class="chat-wrapper" id="chatWrapper">
+        <header class="chat-header">
+            <img class="chat-header-logo"
+                 src="https://raw.githubusercontent.com/HorrorParanormales5/ALIEN-SECRETS/main/LOGO%20OFICIAL.png"
+                 alt="UFOCS">
+            <div>
+                <div class="chat-header-title"><span style="color:var(--green)">UF</span>OCS</div>
+                <div class="chat-header-sub">Cybersecurity Virtual Agent</div>
+            </div>
+            <div class="chat-header-actions">
+                <button id="settingsToggleBtn" class="icon-btn" type="button" title="Configuración">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path>
+                    </svg>
+                </button>
+                <button id="historyToggleBtn" class="icon-btn" type="button" title="Historial de chats">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12a9 9 0 1 0 3-6.7"></path>
+                        <path d="M3 5v5h5"></path>
+                        <path d="M12 7v5l3 3"></path>
+                    </svg>
+                </button>
+                <button id="chatLogoutBtn" class="chat-logout-btn" type="button" title="Cerrar sesión">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+                        <line x1="12" y1="2" x2="12" y2="12"></line>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <div class="chat-tabs">
+            <button class="chat-tab active" type="button" data-chattab="chat">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Chat
+            </button>
+            <button class="chat-tab" type="button" data-chattab="alerts">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                Alerts
+            </button>
+        </div>
+
+        <!-- PANEL: HISTORIAL DE CHATS (nuevo chat / cambiar / borrar) -->
+        <div class="chat-history-overlay" id="chatHistoryOverlay"></div>
+        <div class="chat-history-panel" id="chatHistoryPanel">
+            <div class="chat-history-header">
+                <h4>Tus chats</h4>
+                <button type="button" class="icon-btn-sm" id="historyPanelClose" title="Cerrar">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <button type="button" class="new-chat-btn" id="newChatBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+                Nuevo chat
+            </button>
+            <div class="chat-sessions-list" id="chatSessionsList"></div>
+        </div>
+
+        <!-- PANEL: SETTINGS (elegir modelo de Ollama) -->
+        <div class="chat-history-overlay" id="settingsOverlay"></div>
+        <div class="settings-panel" id="settingsPanel">
+            <div class="chat-history-header">
+                <h4>Configuración</h4>
+                <button type="button" class="icon-btn-sm" id="settingsPanelClose" title="Cerrar">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="settings-body">
+                <div class="model-switch-card">
+                    <div class="model-switch-row">
+                        <div>
+                            <div class="model-switch-label" id="modelSwitchLabel">Qwen 2.5 3B</div>
+                            <div class="model-switch-desc" id="modelSwitchDesc">Modelo ligero y rápido, ideal para respuestas ágiles.</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="modelToggleInput">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="model-switch-endpoints">
+                        <span>Qwen 2.5 3B</span>
+                        <span>Gemma4 26B</span>
+                    </div>
+                    <div class="model-switch-status" id="modelSwitchStatus">Modelo activo: qwen2.5:3b</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTA: CHAT -->
+        <div class="chat-view-body" id="chatViewBody" style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+            <div class="chat-messages" id="chatMessages"></div>
+
+            <div class="attach-preview-bar" id="attachPreviewBar"></div>
+
+            <form class="chat-input-bar" id="chatForm" autocomplete="off">
+                <div class="attach-wrap" style="position:relative;">
+                    <button type="button" class="attach-btn" id="attachBtn" title="Adjuntar">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+                    </button>
+                    <div class="attach-menu" id="attachMenu">
+                        <button type="button" data-attach="image">🖼️ Subir imagen</button>
+                        <button type="button" data-attach="camera">📷 Tomar foto</button>
+                        <button type="button" data-attach="file">📎 Subir archivo (PDF, TXT, XML...)</button>
+                    </div>
+                </div>
+                <input type="file" id="fileImageInput" accept="image/*" hidden>
+                <input type="file" id="fileDocInput" accept=".pdf,.txt,.xml,.csv,.json,.md,.log" hidden>
+                <img class="chat-avatar" id="chatAvatar"
+                     src="https://raw.githubusercontent.com/HorrorParanormales5/ALIEN-SECRETS/main/agente%20virtual.png"
+                     alt="Agente virtual">
+                <input type="text" id="chatInput" placeholder="Escribe tu pregunta de ciberseguridad..." required>
+                <button type="submit" class="chat-send-btn" id="chatSendBtn" title="Enviar">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+                <button type="button" class="chat-stop-btn" id="chatStopBtn" title="Detener" style="display:none;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <rect x="5" y="5" width="14" height="14" rx="2"></rect>
+                    </svg>
+                </button>
+            </form>
+        </div>
+
+        <!-- VISTA: ALERTS -->
+        <div class="alerts-body" id="alertsBody">
+            <div class="alerts-list-col">
+                <div class="alerts-list-header">
+                    <h3>Alerts</h3>
+                    <button type="button" id="newAlertBtn">+ Nueva alerta</button>
+                </div>
+                <div class="alerts-scope-tabs">
+                    <button class="scope-tab active" type="button" data-scope="mine">Mis alertas</button>
+                    <button class="scope-tab" type="button" data-scope="general">General</button>
+                </div>
+                <div class="alerts-list-items" id="alertsListItems"></div>
+            </div>
+            <div class="alert-detail-col" id="alertDetailCol">
+                <div class="alert-detail-header">
+                    <input type="text" class="alert-name-input" id="alertNameInput" maxlength="200" placeholder="Nombre de la alerta">
+                    <button type="button" class="alert-detail-close" id="alertDetailClose" title="Cerrar">✕</button>
+                </div>
+
+                <div class="alert-field">
+                    <label>Descripción</label>
+                    <textarea id="alertDescripcion" maxlength="4000" placeholder="¿Qué se detectó? Contexto de la alerta..."></textarea>
+                    <div class="char-count" id="countDescripcion">0 / 4000</div>
+                </div>
+                <div class="alert-field">
+                    <label>Analysis</label>
+                    <textarea id="alertAnalysis" maxlength="4000" placeholder="Pasos para investigar esta alerta..."></textarea>
+                    <div class="char-count" id="countAnalysis">0 / 4000</div>
+                </div>
+                <div class="alert-field">
+                    <label>Artifacts</label>
+                    <textarea id="alertArtifacts" maxlength="4000" placeholder="IOCs, hashes, IPs, logs relevantes..."></textarea>
+                    <div class="char-count" id="countArtifacts">0 / 4000</div>
+                </div>
+                <div class="alert-field">
+                    <label>Solution</label>
+                    <textarea id="alertSolution" maxlength="4000" placeholder="Remediación aplicada o recomendada..."></textarea>
+                    <div class="char-count" id="countSolution">0 / 4000</div>
+                </div>
+
+                <div class="alert-detail-actions">
+                    <button type="button" class="alert-delete-btn" id="alertDeleteBtn">Eliminar</button>
+                    <button type="button" class="alert-save-btn" id="alertSaveBtn">💾 Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MODAL: CÁMARA -->
+<div id="cameraModal">
+    <video id="cameraVideo" autoplay playsinline muted></video>
+    <div class="camera-controls">
+        <button type="button" id="cameraCancelBtn">Cancelar</button>
+        <button type="button" class="capture" id="cameraCaptureBtn">📸 Capturar</button>
+    </div>
+</div>
+
+<!-- MODAL: ELEGIR DÓNDE GUARDAR LA ALERTA -->
+<div class="scope-modal-overlay" id="scopeModalOverlay">
+    <div class="scope-modal">
+        <h4>¿Dónde quieres guardar esta alerta?</h4>
+        <p>Puedes guardarla solo para ti, o compartirla para que otros usuarios la vean.</p>
+        <div class="scope-modal-options">
+            <button type="button" id="scopeSaveUser">Guardar bajo mi usuario
+                <small>Solo tú la verás</small>
+            </button>
+            <button type="button" id="scopeSaveGeneral">Guardar en General
+                <small>Visible para todos los usuarios</small>
+            </button>
+        </div>
+        <button type="button" class="scope-modal-cancel" id="scopeModalCancel">Cancelar</button>
+    </div>
+</div>
+
+<!-- ============================================================
+     PANEL FLOTANTE: BASE DE DATOS LOCAL
+============================================================ -->
+
+<script>
+/* ============================================================
+   UFOCS - Lógica de la app (un solo archivo, sin backend)
+   Los usuarios viven en localStorage del navegador. Además se
+   puede conectar/descargar un archivo .txt local como respaldo
+   legible (tipo Notepad).
+   ============================================================ */
+
+const USERS_KEY = 'ufocs_users';
+const SESSION_KEY = 'ufocs_session_user';
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await seedDefaultUser();
+    initNavigation();
+    initPasswordToggles();
+    initPasswordStrength();
+    initLoginForm();
+    initRegisterForm();
+    initForgotForm();
+    initDashboard();
+    initChat();
+    initBinaryBackground();
+    resumeSessionIfAny();
+});
+
+// ============================================================
+// USUARIO INICIAL PRECARGADO
+// ============================================================
+async function seedDefaultUser() {
+    const users = getUsers();
+    const key = 'gibrannabdala';
+    if (!users[key]) {
+        users[key] = {
+            username: 'GibrannAbdala',
+            passwordHash: await hashPassword('Gibrann5577'),
+            createdAt: new Date().toISOString()
+        };
+        saveUsers(users);
+    }
+}
+
+// ============================================================
+// NAVEGACIÓN ENTRE PANTALLAS (SPA)
+// ============================================================
+function showScreen(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + name).classList.add('active');
+    const binaryBg = document.getElementById('binary-bg');
+    if (binaryBg) binaryBg.classList.toggle('active', name === 'chat');
+}
+
+function initNavigation() {
+    document.querySelectorAll('[data-goto]').forEach(el => {
+        el.addEventListener('click', (e) => {
+            e.preventDefault();
+            showScreen(el.getAttribute('data-goto'));
+        });
+    });
+}
+
+function resumeSessionIfAny() {
+    const user = getSession();
+    if (user) {
+        showScreen('chat');
+        chatWelcomeMessage(user);
+    }
+}
+
+// ============================================================
+// "BASE DE DATOS" EN localStorage
+// ============================================================
+function getUsers() {
+    try { return JSON.parse(localStorage.getItem(USERS_KEY)) || {}; }
+    catch (e) { return {}; }
+}
+
+function saveUsers(users) {
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+}
+
+async function hashPassword(password) {
+    if (window.crypto && window.crypto.subtle) {
+        try {
+            const enc = new TextEncoder().encode(password);
+            const buffer = await crypto.subtle.digest('SHA-256', enc);
+            return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        } catch (e) { /* sigue al fallback */ }
+    }
+    let hash = 0;
+    for (let i = 0; i < password.length; i++) {
+        hash = (hash << 5) - hash + password.charCodeAt(i);
+        hash |= 0;
+    }
+    return 'fallback_' + hash.toString(36) + '_' + password.length;
+}
+
+function usernameValid(username) {
+    return /^[a-zA-Z0-9_.]{3,20}$/.test(username || '');
+}
+
+// ============================================================
+// SESIÓN
+// ============================================================
+function setSession(username) { sessionStorage.setItem(SESSION_KEY, username); }
+function getSession() { return sessionStorage.getItem(SESSION_KEY); }
+function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
+
+function initDashboard() {
+    document.getElementById('chatLogoutBtn').addEventListener('click', () => {
+        clearSession();
+        chatHistory = [];
+        currentChatSessionId = null;
+        document.getElementById('chatMessages').innerHTML = '';
+        closeHistoryPanel();
+        showScreen('login');
+    });
+}
+
+// ============================================================
+// TRANSICIÓN DE ENTRADA (circuitos + logo) → CHAT
+// ============================================================
+function enterViaTransition(username) {
+    showScreen('transition');
+    const transitionEl = document.getElementById('screen-transition');
+    setTimeout(() => {
+        transitionEl.classList.add('fade-out');
+        setTimeout(() => {
+            transitionEl.classList.remove('fade-out');
+            showScreen('chat');
+            chatWelcomeMessage(username);
+        }, 500);
+    }, 2600);
+}
+
+// ============================================================
+// MOSTRAR / OCULTAR CONTRASEÑA
+// ============================================================
+function initPasswordToggles() {
+    document.querySelectorAll('.toggle-visibility').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const wrap = btn.closest('.input-wrap');
+            const input = wrap ? wrap.querySelector('input') : null;
+            if (!input) return;
+            const isHidden = input.type === 'password';
+            input.type = isHidden ? 'text' : 'password';
+            btn.setAttribute('aria-label', isHidden ? 'Ocultar contraseña' : 'Mostrar contraseña');
+        });
+    });
+}
+
+// ============================================================
+// BARRA DE FORTALEZA DE CONTRASEÑA (registro)
+// ============================================================
+function initPasswordStrength() {
+    const passwordInput = document.getElementById('regPassword');
+    const fill = document.getElementById('regStrengthFill');
+    if (!passwordInput || !fill) return;
+
+    passwordInput.addEventListener('input', () => {
+        const val = passwordInput.value;
+        let score = 0;
+        if (val.length >= 6) score += 1;
+        if (val.length >= 10) score += 1;
+        if (/[A-Z]/.test(val)) score += 1;
+        if (/[0-9]/.test(val)) score += 1;
+        if (/[^A-Za-z0-9]/.test(val)) score += 1;
+
+        fill.style.width = Math.min(100, (score / 5) * 100) + '%';
+        if (score <= 1) fill.style.background = '#ff5c5c';
+        else if (score <= 3) fill.style.background = 'linear-gradient(90deg, #d68f34, #e8b74e)';
+        else fill.style.background = 'linear-gradient(90deg, #1c6b41, #34d67a)';
+    });
+}
+
+// ============================================================
+// MENSAJES DE ERROR / ÉXITO
+// ============================================================
+function showMessage(id, text, type) {
+    const box = document.getElementById(id);
+    if (!box) return;
+    box.textContent = text;
+    box.className = 'form-message show ' + (type === 'success' ? 'success' : 'error');
+}
+function clearMessage(id) {
+    const box = document.getElementById(id);
+    if (box) box.className = 'form-message';
+}
+function setLoading(btn, loading, loadingText, defaultText) {
+    if (!btn) return;
+    btn.disabled = loading;
+    btn.textContent = loading ? loadingText : defaultText;
+}
+
+// ============================================================
+// LOGIN
+// ============================================================
+function initLoginForm() {
+    const form = document.getElementById('loginForm');
+    const submitBtn = document.getElementById('loginSubmitBtn');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearMessage('loginMessage');
+
+        const username = document.getElementById('loginUsername').value.trim();
+        const password = document.getElementById('loginPassword').value;
+
+        if (!username || !password) {
+            showMessage('loginMessage', 'Ingresa usuario y contraseña.', 'error');
+            return;
+        }
+
+        setLoading(submitBtn, true, 'Ingresando...', 'Ingresar');
+
+        const users = getUsers();
+        const user = users[username.toLowerCase()];
+        const hashed = await hashPassword(password);
+
+        if (!user || user.passwordHash !== hashed) {
+            showMessage('loginMessage', 'Usuario o contraseña incorrectos.', 'error');
+            setLoading(submitBtn, false, 'Ingresando...', 'Ingresar');
+            return;
+        }
+
+        setSession(user.username);
+        showMessage('loginMessage', 'Acceso concedido. Iniciando sistema...', 'success');
+        setTimeout(() => {
+            enterViaTransition(user.username);
+            setLoading(submitBtn, false, 'Ingresando...', 'Ingresar');
+            form.reset();
+        }, 400);
+    });
+}
+
+// ============================================================
+// REGISTRO
+// ============================================================
+function initRegisterForm() {
+    const form = document.getElementById('registerForm');
+    const submitBtn = document.getElementById('registerSubmitBtn');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearMessage('registerMessage');
+
+        const username = document.getElementById('regUsername').value.trim();
+        const password = document.getElementById('regPassword').value;
+        const confirm = document.getElementById('regConfirm').value;
+
+        if (!usernameValid(username)) {
+            showMessage('registerMessage', "El usuario debe tener 3-20 caracteres (letras, números, '.' o '_').", 'error');
+            return;
+        }
+        if (password.length < 6) {
+            showMessage('registerMessage', 'La contraseña debe tener al menos 6 caracteres.', 'error');
+            return;
+        }
+        if (password !== confirm) {
+            showMessage('registerMessage', 'Las contraseñas no coinciden.', 'error');
+            return;
+        }
+
+        setLoading(submitBtn, true, 'Creando cuenta...', 'Crear cuenta');
+
+        const users = getUsers();
+        const key = username.toLowerCase();
+        if (users[key]) {
+            showMessage('registerMessage', 'Ese usuario ya existe.', 'error');
+            setLoading(submitBtn, false, 'Creando cuenta...', 'Crear cuenta');
+            return;
+        }
+
+        users[key] = {
+            username,
+            passwordHash: await hashPassword(password),
+            createdAt: new Date().toISOString()
+        };
+        saveUsers(users);
+        setSession(username);
+
+        showMessage('registerMessage', 'Cuenta creada. Iniciando sistema...', 'success');
+        setTimeout(() => {
+            enterViaTransition(username);
+            setLoading(submitBtn, false, 'Creando cuenta...', 'Crear cuenta');
+            form.reset();
+        }, 400);
+    });
+}
+
+// ============================================================
+// RECUPERAR CONTRASEÑA (simulado, sin envío real de correo)
+// ============================================================
+function initForgotForm() {
+    const form = document.getElementById('forgotForm');
+    const submitBtn = document.getElementById('forgotSubmitBtn');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearMessage('forgotMessage');
+
+        const username = document.getElementById('forgotUsername').value.trim();
+        if (!username) {
+            showMessage('forgotMessage', 'Ingresa tu usuario.', 'error');
+            return;
+        }
+
+        setLoading(submitBtn, true, 'Enviando...', 'Enviar instrucciones');
+        await new Promise(r => setTimeout(r, 500));
+        showMessage('forgotMessage', 'Si el usuario existe, se enviarían instrucciones. (Demo sin envío real de correo)', 'success');
+        setLoading(submitBtn, false, 'Enviando...', 'Enviar instrucciones');
+    });
+}
+
+// ============================================================
+// CHAT - AGENTE VIRTUAL UFOCS (Ollama, a través de un puente local en Flask)
+// ============================================================
+// El navegador ya NO le habla directo a Ollama (eso causaba el bloqueo de
+// CORS). Le habla a nuestro propio servidor Flask (app.py), en el MISMO
+// origen que esta página, y es Flask quien internamente reenvía la
+// petición a Ollama. Al ser una llamada servidor-a-servidor, CORS no
+// aplica ahí, así que el problema desaparece por completo.
+const OLLAMA_API_URL = '/api/chat';
+// Los dos modelos entre los que se puede alternar desde el panel de Settings.
+// IMPORTANTE: los tags deben coincidir EXACTO con lo que aparece al correr
+// "ollama list" en tu terminal.
+const MODEL_QWEN = 'qwen2.5:3b';   // rápido, respuestas ágiles
+const MODEL_GEMMA = 'gemma4:26b';  // más grande, análisis más profundo pero más lento
+const MODEL_STORAGE_KEY = 'ufocs_active_model';
+
+// Modelo activo actual (se recuerda entre sesiones vía localStorage)
+let OLLAMA_MODEL = localStorage.getItem(MODEL_STORAGE_KEY) === MODEL_GEMMA ? MODEL_GEMMA : MODEL_QWEN;
+
+let chatHistory = []; // { role: 'user'|'assistant', content: string, image?: base64string }
+let pendingAttachment = null; // { kind:'image'|'text', name, dataUrl?, textContent? }
+let cameraStream = null;
+let currentChatSessionId = null; // chat activo dentro del historial de conversaciones del usuario
+
+async function chatWelcomeMessage(username) {
+    document.getElementById('chatMessages').innerHTML = '';
+    chatHistory = [];
+
+    // Migramos/leemos el historial "clásico" guardado en el servidor Flask (compatibilidad)
+    const previousServerHistory = await loadHistory(username);
+    const sessions = ensureSessionsLoaded(username, previousServerHistory);
+    sessions.sort((a, b) => b.updatedAt - a.updatedAt);
+    const current = sessions[0];
+    currentChatSessionId = current.id;
+
+    if (current.messages && current.messages.length) {
+        chatHistory = current.messages.slice();
+        chatHistory.forEach(m => {
+            appendMessage(m.role === 'user' ? 'user' : 'assistant', m.content, m.image ? ('data:image/jpeg;base64,' + m.image) : null);
+        });
+        appendMessage('assistant', 'He recuperado nuestra conversación anterior. ¿Seguimos donde lo dejamos?');
+    } else {
+        appendMessage('assistant', 'Hola' + (username ? ', ' + username : '') + '. Soy UFOCS, tu agente virtual de ciberseguridad. ¿En qué puedo ayudarte hoy?');
+    }
+    renderChatSessionsList();
+    document.getElementById('chatInput').focus();
+}
+
+function initChat() {
+    document.getElementById('chatForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const input = document.getElementById('chatInput');
+        const text = input.value.trim();
+        if (!text && !pendingAttachment) return;
+        input.value = '';
+        sendToOllama(text || '(archivo adjunto)');
+    });
+    initAttachments();
+    initCamera();
+    initChatTabs();
+    initAlerts();
+    initStopButton();
+    initChatHistoryPanel();
+    initSettingsPanel();
+}
+
+// ============================================================
+// MÚLTIPLES CHATS: crear, cambiar, borrar (independiente de Alerts)
+// ============================================================
+function chatSessionsKey(username) { return 'ufocs_chat_sessions_' + username; }
+
+function loadChatSessions(username) {
+    if (!username) return [];
+    try { return JSON.parse(localStorage.getItem(chatSessionsKey(username))) || []; }
+    catch (e) { return []; }
+}
+
+function saveChatSessions(username, sessions) {
+    if (!username) return;
+    localStorage.setItem(chatSessionsKey(username), JSON.stringify(sessions));
+}
+
+function genSessionId() {
+    return 's_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+}
+
+function deriveSessionTitle(messages) {
+    const firstUser = (messages || []).find(m => m.role === 'user' && m.content);
+    if (!firstUser) return 'Nueva conversación';
+    const clean = firstUser.content.replace(/\s+/g, ' ').trim();
+    return clean.length > 34 ? clean.slice(0, 34) + '…' : clean;
+}
+
+function ensureSessionsLoaded(username, previousServerHistory) {
+    let sessions = loadChatSessions(username);
+    if (!sessions.length) {
+        const initialMessages = (previousServerHistory && previousServerHistory.length) ? previousServerHistory : [];
+        sessions = [{
+            id: genSessionId(),
+            title: deriveSessionTitle(initialMessages),
+            messages: initialMessages,
+            updatedAt: Date.now()
+        }];
+        saveChatSessions(username, sessions);
+    }
+    return sessions;
+}
+
+function saveCurrentSession() {
+    const username = getSession();
+    if (!username || !currentChatSessionId) return;
+    let sessions = loadChatSessions(username);
+    let session = sessions.find(s => s.id === currentChatSessionId);
+    if (!session) {
+        session = { id: currentChatSessionId, title: 'Nueva conversación', messages: [], updatedAt: Date.now() };
+        sessions.push(session);
+    }
+    session.messages = chatHistory;
+    session.updatedAt = Date.now();
+    if (!session.title || session.title === 'Nueva conversación') {
+        session.title = deriveSessionTitle(chatHistory);
+    }
+    saveChatSessions(username, sessions);
+    renderChatSessionsList();
+}
+
+function loadSessionIntoChat(session) {
+    document.getElementById('chatMessages').innerHTML = '';
+    chatHistory = (session.messages || []).slice();
+    if (chatHistory.length) {
+        chatHistory.forEach(m => {
+            appendMessage(m.role === 'user' ? 'user' : 'assistant', m.content, m.image ? ('data:image/jpeg;base64,' + m.image) : null);
+        });
+    } else {
+        appendMessage('assistant', 'Nuevo chat iniciado. ¿En qué puedo ayudarte?');
+    }
+}
+
+function startNewChat() {
+    const username = getSession();
+    if (!username) return;
+    const sessions = loadChatSessions(username);
+    const newSession = { id: genSessionId(), title: 'Nueva conversación', messages: [], updatedAt: Date.now() };
+    sessions.unshift(newSession);
+    saveChatSessions(username, sessions);
+    currentChatSessionId = newSession.id;
+    loadSessionIntoChat(newSession);
+    renderChatSessionsList();
+    closeHistoryPanel();
+    document.getElementById('chatInput').focus();
+}
+
+function switchChatSession(session) {
+    if (session.id === currentChatSessionId) { closeHistoryPanel(); return; }
+    currentChatSessionId = session.id;
+    loadSessionIntoChat(session);
+    renderChatSessionsList();
+    closeHistoryPanel();
+}
+
+function deleteChatSessionById(id) {
+    const username = getSession();
+    if (!username) return;
+    let sessions = loadChatSessions(username);
+    sessions = sessions.filter(s => s.id !== id);
+    if (!sessions.length) {
+        sessions = [{ id: genSessionId(), title: 'Nueva conversación', messages: [], updatedAt: Date.now() }];
+    }
+    saveChatSessions(username, sessions);
+    if (id === currentChatSessionId) {
+        sessions.sort((a, b) => b.updatedAt - a.updatedAt);
+        currentChatSessionId = sessions[0].id;
+        loadSessionIntoChat(sessions[0]);
+    }
+    renderChatSessionsList();
+}
+
+function renderChatSessionsList() {
+    const username = getSession();
+    const container = document.getElementById('chatSessionsList');
+    if (!container) return;
+    const sessions = loadChatSessions(username).slice().sort((a, b) => b.updatedAt - a.updatedAt);
+    container.innerHTML = '';
+    if (!sessions.length) {
+        container.innerHTML = '<div class="chat-history-empty">Aún no tienes chats guardados.</div>';
+        return;
+    }
+    sessions.forEach(s => {
+        const item = document.createElement('div');
+        item.className = 'chat-session-item' + (s.id === currentChatSessionId ? ' active' : '');
+
+        const title = document.createElement('span');
+        title.className = 'chat-session-title';
+        title.textContent = s.title || 'Nueva conversación';
+
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'chat-session-delete';
+        delBtn.title = 'Eliminar este chat';
+        delBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6M14 11v6"></path><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>';
+        delBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (confirm('¿Eliminar esta conversación? Esto no afecta tus alertas guardadas.')) {
+                deleteChatSessionById(s.id);
+            }
+        });
+
+        item.appendChild(title);
+        item.appendChild(delBtn);
+        item.addEventListener('click', () => switchChatSession(s));
+        container.appendChild(item);
+    });
+}
+
+function initChatHistoryPanel() {
+    document.getElementById('historyToggleBtn').addEventListener('click', () => {
+        renderChatSessionsList();
+        document.getElementById('chatHistoryPanel').classList.add('open');
+        document.getElementById('chatHistoryOverlay').classList.add('active');
+    });
+    document.getElementById('chatHistoryOverlay').addEventListener('click', closeHistoryPanel);
+    document.getElementById('historyPanelClose').addEventListener('click', closeHistoryPanel);
+    document.getElementById('newChatBtn').addEventListener('click', startNewChat);
+}
+
+function closeHistoryPanel() {
+    document.getElementById('chatHistoryPanel').classList.remove('open');
+    document.getElementById('chatHistoryOverlay').classList.remove('active');
+}
+
+// ============================================================
+// SETTINGS: panel para alternar entre Qwen 2.5 3B y Gemma4 26B
+// ============================================================
+function updateModelSwitchUI() {
+    const isGemma = OLLAMA_MODEL === MODEL_GEMMA;
+    document.getElementById('modelSwitchLabel').textContent = isGemma ? 'Gemma4 26B' : 'Qwen 2.5 3B';
+    document.getElementById('modelSwitchDesc').textContent = isGemma
+        ? 'Modelo más grande, con más profundidad de análisis, pero más lento en responder.'
+        : 'Modelo ligero y rápido, ideal para respuestas ágiles.';
+    document.getElementById('modelSwitchStatus').textContent = 'Modelo activo: ' + OLLAMA_MODEL;
+}
+
+function initSettingsPanel() {
+    const toggle = document.getElementById('modelToggleInput');
+    toggle.checked = (OLLAMA_MODEL === MODEL_GEMMA);
+    updateModelSwitchUI();
+
+    toggle.addEventListener('change', () => {
+        OLLAMA_MODEL = toggle.checked ? MODEL_GEMMA : MODEL_QWEN;
+        localStorage.setItem(MODEL_STORAGE_KEY, OLLAMA_MODEL);
+        updateModelSwitchUI();
+    });
+
+    document.getElementById('settingsToggleBtn').addEventListener('click', () => {
+        document.getElementById('settingsPanel').classList.add('open');
+        document.getElementById('settingsOverlay').classList.add('active');
+    });
+    document.getElementById('settingsOverlay').addEventListener('click', closeSettingsPanel);
+    document.getElementById('settingsPanelClose').addEventListener('click', closeSettingsPanel);
+}
+
+function closeSettingsPanel() {
+    document.getElementById('settingsPanel').classList.remove('open');
+    document.getElementById('settingsOverlay').classList.remove('active');
+}
+
+function appendMessage(role, text, imageDataUrl) {
+    const messages = document.getElementById('chatMessages');
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble ' + role;
+    if (imageDataUrl) {
+        const img = document.createElement('img');
+        img.src = imageDataUrl;
+        img.className = 'chat-bubble-image';
+        bubble.appendChild(img);
+    }
+    const textEl = document.createElement('div');
+    textEl.textContent = text;
+    bubble.appendChild(textEl);
+    messages.appendChild(bubble);
+    messages.scrollTop = messages.scrollHeight;
+    return bubble;
+}
+
+function appendTypingBubble() {
+    const messages = document.getElementById('chatMessages');
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble assistant typing-bubble';
+    bubble.id = 'typingBubble';
+    bubble.innerHTML = '<span></span><span></span><span></span>';
+    messages.appendChild(bubble);
+    messages.scrollTop = messages.scrollHeight;
+}
+
+function removeTypingBubble() {
+    const el = document.getElementById('typingBubble');
+    if (el) el.remove();
+}
+
+let activeAbortController = null;
+
+function setThinking(isThinking) {
+    const avatar = document.getElementById('chatAvatar');
+    const sendBtn = document.getElementById('chatSendBtn');
+    const stopBtn = document.getElementById('chatStopBtn');
+    avatar.classList.toggle('thinking', isThinking);
+    sendBtn.disabled = isThinking;
+    sendBtn.style.display = isThinking ? 'none' : 'flex';
+    stopBtn.style.display = isThinking ? 'flex' : 'none';
+}
+
+function initStopButton() {
+    document.getElementById('chatStopBtn').addEventListener('click', () => {
+        if (activeAbortController) activeAbortController.abort();
+    });
+}
+
+async function sendToOllama(userText) {
+    const attachment = pendingAttachment;
+    pendingAttachment = null;
+    renderAttachPreview();
+
+    // Lo que se ve en pantalla
+    let displayText = userText;
+    if (attachment && attachment.kind === 'text') {
+        displayText += '\n📄 Adjunto: ' + attachment.name;
+    }
+    appendMessage('user', displayText, attachment && attachment.kind === 'image' ? attachment.dataUrl : null);
+
+    // Lo que se le manda al modelo (con el contenido del archivo si aplica)
+    let fullUserText = userText;
+    if (attachment && attachment.kind === 'text') {
+        fullUserText += '\n\n[Contenido del archivo adjunto "' + attachment.name + '"]:\n' + attachment.textContent;
+    }
+
+    const historyEntry = { role: 'user', content: fullUserText };
+    if (attachment && attachment.kind === 'image') {
+        historyEntry.image = attachment.dataUrl.split(',')[1]; // base64 puro, sin el prefijo data:
+    }
+    chatHistory.push(historyEntry);
+
+    setThinking(true);
+    appendTypingBubble();
+
+    const messages = buildPrompt(chatHistory);
+    activeAbortController = new AbortController();
+
+    let streamBubble = null;
+    const chatMessagesEl = document.getElementById('chatMessages');
+
+    try {
+        const reply = await queryOllama(messages, activeAbortController.signal, (delta, fullSoFar) => {
+            // En cuanto llega el primer pedazo de texto, quitamos los "..." y
+            // arrancamos una burbuja real que se va llenando en vivo.
+            if (!streamBubble) {
+                removeTypingBubble();
+                streamBubble = appendMessage('assistant', '');
+            }
+            const textEl = streamBubble.lastElementChild;
+            if (textEl) textEl.textContent = fullSoFar;
+            chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+        });
+
+        removeTypingBubble();
+        if (!streamBubble) {
+            // Por si no llegó nada por streaming (fallback sin streaming del servidor)
+            appendMessage('assistant', reply);
+        }
+        chatHistory.push({ role: 'assistant', content: reply });
+        persistHistory();
+        saveCurrentSession();
+    } catch (err) {
+        removeTypingBubble();
+        if (err.name === 'AbortError') {
+            // El usuario le dio "Detener": quitamos la última pregunta del historial
+            // para que no quede una pregunta sin responder confundiendo al modelo después.
+            if (streamBubble) streamBubble.remove();
+            chatHistory.pop();
+            appendMessage('assistant', '⏹️ Generación detenida.');
+        } else {
+            if (streamBubble) streamBubble.remove();
+            const bubble = appendMessage('assistant', '⚠️ ' + (err.message || 'Ocurrió un error al conectar con el modelo de IA.'));
+            bubble.classList.add('error');
+        }
+    } finally {
+        setThinking(false);
+        activeAbortController = null;
+    }
+}
+
+function buildPrompt(history) {
+    let systemPrompt = 'Eres UFOCS, un agente virtual experto en ciberseguridad, creado y diseñado por Gibrann Abdala. ' +
+        'Si te preguntan quién te creó, quién te diseñó, quién te programó o quién está detrás de UFOCS, responde siempre que Gibrann Abdala fue tu diseñador. ' +
+        'Respondes en español, de forma clara, breve y útil. Si te comparten una imagen, describe qué observas y evalúa si hay algo relevante para ciberseguridad (phishing, malware, capturas de pantalla sospechosas, etc.).';
+
+    const messages = [{ role: 'system', content: systemPrompt }];
+    history.slice(-20).forEach(m => {
+        const msg = { role: m.role === 'user' ? 'user' : 'assistant', content: m.content };
+        if (m.image) msg.images = [m.image];
+        messages.push(msg);
+    });
+    return messages;
+}
+
+async function queryOllama(messages, signal, onDelta) {
+    let res;
+    try {
+        res = await fetch(OLLAMA_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: OLLAMA_MODEL,
+                messages: messages,
+                stream: true, // Streaming: el texto llega en pedazos, no todo de golpe
+                keep_alive: '30m', // Mantiene el modelo cargado en memoria/VRAM entre mensajes
+                options: {
+                    temperature: 0.7,
+                    num_ctx: 10000 // Tamaño máximo del contexto (evita el error "exceeds the available context size")
+                }
+            }),
+            signal
+        });
+    } catch (networkErr) {
+        if (networkErr.name === 'AbortError') throw networkErr;
+        // Esto salta si el navegador no logra llegar a tu propio servidor Flask.
+        // Normalmente significa que "python app.py" no está corriendo, o que
+        // no estás abriendo la página desde http://localhost:5000.
+        throw new Error('No se pudo conectar con el servidor local (Flask). Verifica que "python app.py" esté corriendo, y que estés viendo esta página desde http://localhost:5000/ (no con doble clic al archivo).');
+    }
+
+    if (!res.ok) {
+        let errMsg = 'Error del servidor de Ollama (' + res.status + ').';
+        try {
+            const errData = await res.json();
+            if (errData.error) errMsg = errData.error;
+        } catch (e) { /* deja el mensaje por defecto */ }
+
+        if (res.status === 404) errMsg = 'Modelo "' + OLLAMA_MODEL + '" no encontrado en Ollama. Corre "ollama list" en tu terminal y confirma que ese tag exista (¿ya hiciste "ollama pull ' + OLLAMA_MODEL + '"?).';
+        throw new Error(errMsg);
+    }
+
+    // Si por alguna razón el navegador/servidor no soporta cuerpo en streaming,
+    // caemos de regreso a leer la respuesta completa de una vez.
+    if (!res.body || !res.body.getReader) {
+        const data = await res.json();
+        if (data.message && typeof data.message.content === 'string') {
+            const text = data.message.content.trim();
+            if (onDelta && text) onDelta(text, text);
+            return text;
+        }
+        throw new Error('El modelo respondió en un formato inesperado.');
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let fullText = '';
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        // Ollama manda un objeto JSON por línea (NDJSON), uno por cada pedazo de texto
+        const lines = buffer.split('\n');
+        buffer = lines.pop(); // la última línea puede venir incompleta, se guarda para la siguiente vuelta
+
+        for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed) continue;
+            let obj;
+            try { obj = JSON.parse(trimmed); } catch (e) { continue; }
+            if (obj.error) throw new Error(obj.error);
+            if (obj.message && typeof obj.message.content === 'string' && obj.message.content) {
+                fullText += obj.message.content;
+                if (onDelta) onDelta(obj.message.content, fullText);
+            }
+        }
+    }
+
+    if (buffer.trim()) {
+        try {
+            const obj = JSON.parse(buffer.trim());
+            if (obj.message && typeof obj.message.content === 'string' && obj.message.content) {
+                fullText += obj.message.content;
+                if (onDelta) onDelta(obj.message.content, fullText);
+            }
+        } catch (e) { /* ignora un remanente mal formado al final del stream */ }
+    }
+
+    if (!fullText) throw new Error('El modelo respondió en un formato inesperado.');
+    return fullText.trim();
+}
+
+// ============================================================
+// MEMORIA PERSISTENTE (historial guardado en el servidor, por usuario)
+// ============================================================
+async function loadHistory(username) {
+    if (!username) return [];
+    try {
+        const res = await fetch('/api/history/' + encodeURIComponent(username));
+        if (!res.ok) return [];
+        const data = await res.json();
+        return data.history || [];
+    } catch (e) { return []; }
+}
+
+function persistHistory() {
+    const username = getSession();
+    if (!username) return;
+    fetch('/api/history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, history: chatHistory })
+    }).catch(() => { /* si falla, no bloqueamos el chat */ });
+}
+
+// ============================================================
+// ADJUNTOS: imagen, cámara, archivo (PDF/TXT/XML/CSV/JSON)
+// ============================================================
+function initAttachments() {
+    const attachBtn = document.getElementById('attachBtn');
+    const attachMenu = document.getElementById('attachMenu');
+
+    attachBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        attachMenu.classList.toggle('open');
+        attachBtn.classList.toggle('open');
+    });
+    document.addEventListener('click', () => {
+        attachMenu.classList.remove('open');
+        attachBtn.classList.remove('open');
+    });
+
+    attachMenu.querySelectorAll('button[data-attach]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            attachMenu.classList.remove('open');
+            attachBtn.classList.remove('open');
+            const type = btn.getAttribute('data-attach');
+            if (type === 'image') document.getElementById('fileImageInput').click();
+            if (type === 'file') document.getElementById('fileDocInput').click();
+            if (type === 'camera') openCamera();
+        });
+    });
+
+    document.getElementById('fileImageInput').addEventListener('change', handleImageFile);
+    document.getElementById('fileDocInput').addEventListener('change', handleDocFile);
+}
+
+function fileToDataUrl(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+async function handleImageFile(e) {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    const dataUrl = await fileToDataUrl(file);
+    pendingAttachment = { kind: 'image', name: file.name, dataUrl };
+    renderAttachPreview();
+}
+
+async function handleDocFile(e) {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    try {
+        let text;
+        if (ext === 'pdf') {
+            text = await extractPdfText(file);
+        } else {
+            text = await file.text();
+        }
+        pendingAttachment = { kind: 'text', name: file.name, textContent: text.slice(0, 12000) };
+        renderAttachPreview();
+    } catch (err) {
+        appendMessage('assistant', '⚠️ No se pudo leer el archivo "' + file.name + '": ' + err.message);
+    }
+}
+
+async function extractPdfText(file) {
+    if (typeof pdfjsLib === 'undefined') {
+        throw new Error('No se cargó la librería de lectura de PDF (revisa tu conexión a internet).');
+    }
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let text = '';
+    const maxPages = Math.min(pdf.numPages, 15);
+    for (let i = 1; i <= maxPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        text += content.items.map(it => it.str).join(' ') + '\n';
+    }
+    if (pdf.numPages > maxPages) text += '\n[...documento truncado, se leyeron ' + maxPages + ' de ' + pdf.numPages + ' páginas...]';
+    return text;
+}
+
+function renderAttachPreview() {
+    const bar = document.getElementById('attachPreviewBar');
+    bar.innerHTML = '';
+    if (!pendingAttachment) { bar.classList.remove('active'); return; }
+    bar.classList.add('active');
+
+    const chip = document.createElement('div');
+    chip.className = 'attach-chip';
+    if (pendingAttachment.kind === 'image') {
+        const img = document.createElement('img');
+        img.src = pendingAttachment.dataUrl;
+        img.className = 'attach-chip-thumb';
+        chip.appendChild(img);
+    }
+    const label = document.createElement('span');
+    label.textContent = (pendingAttachment.kind === 'image' ? '' : '📄 ') + pendingAttachment.name;
+    chip.appendChild(label);
+
+    const rm = document.createElement('button');
+    rm.type = 'button';
+    rm.className = 'attach-chip-remove';
+    rm.textContent = '✕';
+    rm.addEventListener('click', () => { pendingAttachment = null; renderAttachPreview(); });
+    chip.appendChild(rm);
+
+    bar.appendChild(chip);
+}
+
+// ---------- Cámara en vivo (permiso de cámara, útil en celular) ----------
+function initCamera() {
+    document.getElementById('cameraCancelBtn').addEventListener('click', closeCamera);
+    document.getElementById('cameraCaptureBtn').addEventListener('click', capturePhoto);
+}
+
+async function openCamera() {
+    const modal = document.getElementById('cameraModal');
+    modal.classList.add('active');
+    try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'environment' },
+            audio: false
+        });
+        document.getElementById('cameraVideo').srcObject = cameraStream;
+    } catch (err) {
+        closeCamera();
+        appendMessage('assistant', '⚠️ No se pudo acceder a la cámara (' + err.message + '). Revisa que le hayas dado permiso de cámara a tu navegador para este sitio.');
+    }
+}
+
+function closeCamera() {
+    document.getElementById('cameraModal').classList.remove('active');
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(t => t.stop());
+        cameraStream = null;
+    }
+}
+
+function capturePhoto() {
+    const video = document.getElementById('cameraVideo');
+    if (!video.videoWidth) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+    pendingAttachment = { kind: 'image', name: 'foto_' + Date.now() + '.jpg', dataUrl };
+    renderAttachPreview();
+    closeCamera();
+}
+
+// ============================================================
+// TABS SUPERIORES: Chat / Alerts
+// ============================================================
+function initChatTabs() {
+    document.querySelectorAll('.chat-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.chat-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const target = tab.getAttribute('data-chattab');
+            document.getElementById('chatViewBody').style.display = target === 'chat' ? 'flex' : 'none';
+            const alertsBody = document.getElementById('alertsBody');
+            alertsBody.classList.toggle('active', target === 'alerts');
+            if (target === 'alerts') {
+                closeAlertDetail();
+                refreshAlertsList();
+            } else {
+                document.getElementById('chatWrapper').classList.remove('wide-mode');
+            }
+        });
+    });
+}
+
+// ============================================================
+// ALERTS: listar, crear, editar y guardar (por usuario o General)
+// ============================================================
+let currentAlertScopeTab = 'mine';
+let currentAlertId = null; // null = alerta nueva sin guardar aún
+
+function initAlerts() {
+    document.querySelectorAll('.scope-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.scope-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentAlertScopeTab = tab.getAttribute('data-scope');
+            refreshAlertsList();
+        });
+    });
+
+    document.getElementById('newAlertBtn').addEventListener('click', () => {
+        openAlertDetail(null);
+    });
+    document.getElementById('alertDetailClose').addEventListener('click', closeAlertDetail);
+
+    ['alertDescripcion', 'alertAnalysis', 'alertArtifacts', 'alertSolution'].forEach(id => {
+        const el = document.getElementById(id);
+        const countId = 'count' + id.replace('alert', '');
+        el.addEventListener('input', () => {
+            document.getElementById(countId).textContent = el.value.length + ' / 4000';
+        });
+    });
+
+    document.getElementById('alertSaveBtn').addEventListener('click', () => {
+        document.getElementById('scopeModalOverlay').classList.add('active');
+    });
+    document.getElementById('scopeModalCancel').addEventListener('click', () => {
+        document.getElementById('scopeModalOverlay').classList.remove('active');
+    });
+    document.getElementById('scopeSaveUser').addEventListener('click', () => doSaveAlert('user'));
+    document.getElementById('scopeSaveGeneral').addEventListener('click', () => doSaveAlert('general'));
+
+    document.getElementById('alertDeleteBtn').addEventListener('click', doDeleteAlert);
+}
+
+async function refreshAlertsList() {
+    const username = getSession();
+    const container = document.getElementById('alertsListItems');
+    container.innerHTML = '<div class="alerts-empty">Cargando...</div>';
+    try {
+        const res = await fetch('/api/alerts?username=' + encodeURIComponent(username));
+        const data = await res.json();
+        const list = currentAlertScopeTab === 'mine' ? (data.mine || []) : (data.general || []);
+        renderAlertsList(list);
+    } catch (e) {
+        container.innerHTML = '<div class="alerts-empty">No se pudo cargar la lista de alertas.</div>';
+    }
+}
+
+function renderAlertsList(list) {
+    const container = document.getElementById('alertsListItems');
+    container.innerHTML = '';
+    if (!list.length) {
+        container.innerHTML = '<div class="alerts-empty">Aún no hay alertas aquí.<br>Crea una con "+ Nueva alerta".</div>';
+        return;
+    }
+    list.forEach(alert => {
+        const item = document.createElement('div');
+        item.className = 'alert-list-item' + (alert.id === currentAlertId ? ' selected' : '');
+        const date = alert.updated_at ? new Date(alert.updated_at * 1000).toLocaleString() : '';
+        item.innerHTML = '<div class="alert-name"></div><div class="alert-meta"></div>';
+        item.querySelector('.alert-name').textContent = alert.name;
+        item.querySelector('.alert-meta').textContent = (alert.scope === 'general' ? '🌐 General' : '🔒 Personal') + (date ? ' · ' + date : '');
+        item.addEventListener('click', () => openAlertDetail(alert));
+        container.appendChild(item);
+    });
+}
+
+function openAlertDetail(alert) {
+    currentAlertId = alert ? alert.id : null;
+    document.getElementById('chatWrapper').classList.add('wide-mode');
+    document.getElementById('alertsBody').classList.add('split');
+
+    document.getElementById('alertNameInput').value = alert ? alert.name : '';
+    document.getElementById('alertDescripcion').value = alert ? (alert.descripcion || '') : '';
+    document.getElementById('alertAnalysis').value = alert ? (alert.analysis || '') : '';
+    document.getElementById('alertArtifacts').value = alert ? (alert.artifacts || '') : '';
+    document.getElementById('alertSolution').value = alert ? (alert.solution || '') : '';
+    ['Descripcion', 'Analysis', 'Artifacts', 'Solution'].forEach(field => {
+        const el = document.getElementById('alert' + field);
+        document.getElementById('count' + field).textContent = el.value.length + ' / 4000';
+    });
+    document.getElementById('alertDeleteBtn').style.display = alert ? 'inline-block' : 'none';
+    refreshAlertsList();
+}
+
+function closeAlertDetail() {
+    currentAlertId = null;
+    document.getElementById('chatWrapper').classList.remove('wide-mode');
+    document.getElementById('alertsBody').classList.remove('split');
+}
+
+async function doSaveAlert(scope) {
+    const username = getSession();
+    document.getElementById('scopeModalOverlay').classList.remove('active');
+
+    const name = document.getElementById('alertNameInput').value.trim();
+    if (!name) {
+        alert('Ponle un nombre a la alerta antes de guardar.');
+        return;
+    }
+    if (!username) {
+        alert('No hay una sesión activa. Vuelve a iniciar sesión e intenta de nuevo.');
+        return;
+    }
+
+    const payload = {
+        id: currentAlertId,
+        username,
+        scope,
+        name,
+        descripcion: document.getElementById('alertDescripcion').value,
+        analysis: document.getElementById('alertAnalysis').value,
+        artifacts: document.getElementById('alertArtifacts').value,
+        solution: document.getElementById('alertSolution').value
+    };
+
+    let res;
+    try {
+        res = await fetch('/api/alerts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+    } catch (networkErr) {
+        appendMessage('assistant', '⚠️ No se pudo conectar con el servidor Flask para guardar la alerta (' + networkErr.message + '). Verifica que "python app.py" siga corriendo y que la página esté en http://localhost:5000/.');
+        return;
+    }
+
+    let body;
+    const rawText = await res.text();
+    try { body = JSON.parse(rawText); }
+    catch (parseErr) {
+        // El servidor no devolvió JSON (por ejemplo, una página de error HTML) — mostramos
+        // lo que realmente pasó en vez de un mensaje genérico.
+        appendMessage('assistant', '⚠️ El servidor respondió algo inesperado al guardar la alerta (código ' + res.status + '). Revisa la terminal donde corre "python app.py" para ver el detalle del error.');
+        return;
+    }
+
+    if (!res.ok) {
+        appendMessage('assistant', '⚠️ No se pudo guardar la alerta: ' + (body.error || ('error ' + res.status)));
+        return;
+    }
+
+    currentAlertId = body.id;
+    document.getElementById('alertDeleteBtn').style.display = 'inline-block';
+    currentAlertScopeTab = scope === 'general' ? 'general' : 'mine';
+    document.querySelectorAll('.scope-tab').forEach(t => t.classList.toggle('active', t.getAttribute('data-scope') === currentAlertScopeTab));
+    refreshAlertsList();
+}
+
+function doDeleteAlert() {
+    if (!currentAlertId) return;
+    const username = getSession();
+    fetch('/api/alerts/' + currentAlertId + '?username=' + encodeURIComponent(username), { method: 'DELETE' })
+        .then(() => { closeAlertDetail(); refreshAlertsList(); })
+        .catch(() => {});
+}
+
+// ============================================================
+// FONDO ANIMADO: números binarios verdes parpadeando al azar
+// ============================================================
+function initBinaryBackground() {
+    const container = document.getElementById('binary-bg');
+    if (!container) return;
+
+    // Cantidad de dígitos en pantalla (menos en móvil para no saturar)
+    const isSmall = window.innerWidth < 600;
+    const COUNT = isSmall ? 110 : 220;
+
+    const bits = [];
+    const frag = document.createDocumentFragment();
+
+    for (let i = 0; i < COUNT; i++) {
+        const span = document.createElement('span');
+        span.className = 'bit';
+        span.textContent = Math.random() < 0.5 ? '0' : '1';
+        span.style.left = (Math.random() * 100) + '%';
+        span.style.top = (Math.random() * 100) + '%';
+        span.style.fontSize = (11 + Math.random() * 10) + 'px';
+        frag.appendChild(span);
+        bits.push(span);
+    }
+    container.appendChild(frag);
+
+    // Cada dígito "vive" en su propio ciclo: espera un tiempo aleatorio,
+    // cambia de valor (0/1) como si se estuviera "escribiendo", se enciende
+    // (brilla) un instante y luego se apaga otra vez. Todo desincronizado
+    // entre sí para que se vea aleatorio por toda la pantalla.
+    function scheduleBit(el) {
+        const idleTime = 400 + Math.random() * 4200; // tiempo apagado
+        setTimeout(() => {
+            el.textContent = Math.random() < 0.5 ? '0' : '1'; // se "escribe" un nuevo valor
+            el.classList.add('bit-on'); // se enciende
+            const onTime = 120 + Math.random() * 260;
+            setTimeout(() => {
+                el.classList.remove('bit-on'); // se apaga
+                scheduleBit(el); // programa el siguiente parpadeo
+            }, onTime);
+        }, idleTime);
+    }
+
+    bits.forEach((el, i) => {
+        // arranque escalonado para que no empiecen todos al mismo tiempo
+        setTimeout(() => scheduleBit(el), Math.random() * 3000);
+    });
+
+    // Reacomoda posiciones si cambia el tamaño de ventana (orientación, resize)
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            bits.forEach(el => {
+                el.style.left = (Math.random() * 100) + '%';
+                el.style.top = (Math.random() * 100) + '%';
+            });
+        }, 300);
+    });
+}
+</script>
+</body>
+</html>
