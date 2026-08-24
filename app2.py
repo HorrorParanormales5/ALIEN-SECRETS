@@ -1,26 +1,13 @@
 # ============================================================
-# app.py — Puente local entre UFOCS (navegador) y Ollama
+# app.py — Puente local / nube entre UFOCS (navegador) y Ollama
 # ============================================================
 # Qué hace este servidor:
-# 1) Sirve tu archivo HTML de UFOCS en http://localhost:5000/
+# 1) Sirve tu archivo HTML de UFOCS en la raíz
 # 2) Recibe las peticiones de chat del navegador en /api/chat
 #    y las reenvía a Ollama a través del túnel público de Cloudflare.
 # 3) Como este reenvío ocurre servidor-a-servidor (Flask -> Ollama),
 #    NO pasa por CORS del navegador. El navegador solo habla con
-#    Flask, que está en su mismo origen (localhost:5000), así que
-#    tampoco hay bloqueo de ese lado.
-#
-# CÓMO USARLO:
-#   1. Coloca este archivo (app.py) en la MISMA carpeta que tu
-#      archivo HTML de UFOCS.
-#   2. Si tu HTML no se llama "UFOCS_con_mejoras_mas_actual.html", cambia el
-#      nombre en la constante HTML_FILENAME más abajo.
-#   3. Instala las dependencias (una sola vez):
-#        pip install flask requests
-#   4. Asegúrate de que Ollama y Cloudflared estén corriendo.
-#   5. Arranca este servidor:
-#        python app.py
-#   6. Abre en el navegador: http://localhost:5000/
+#    Flask, que está en su mismo origen, así que tampoco hay bloqueo.
 
 from flask import Flask, request, jsonify, send_from_directory
 import requests
@@ -34,8 +21,12 @@ app = Flask(__name__, static_folder=None)
 
 HTML_FILENAME = "UFOCS_con_mejoras_mas_actual.html"   # <-- cambia esto si tu archivo tiene otro nombre
 
-# URL del túnel público de Cloudflare hacia tu servicio Ollama local:
-OLLAMA_URL = "https://compiler-relating-listed-barn.trycloudflare.com/api/chat"
+# Lee dinámicamente la URL desde las variables de entorno de Render (OLLAMA_URL)
+# Si no existe en el entorno, usa por defecto la URL de Cloudflare especificada.
+OLLAMA_URL = os.environ.get(
+    "OLLAMA_URL", 
+    "https://karen-reflect-sec-prospects.trycloudflare.com/api/chat"
+)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -137,9 +128,11 @@ def proxy_chat():
     if not body:
         return jsonify({"error": "Petición sin cuerpo JSON válido."}), 400
 
+    target_url = os.environ.get("OLLAMA_URL", OLLAMA_URL)
+
     try:
         # Sin timeout: modelos grandes pueden tardar varios minutos en procesar.
-        resp = requests.post(OLLAMA_URL, json=body, timeout=None)
+        resp = requests.post(target_url, json=body, timeout=None)
     except requests.exceptions.ConnectionError:
         return jsonify({
             "error": "No se pudo conectar con Ollama a través del túnel de Cloudflare. "
@@ -278,6 +271,7 @@ def handle_any_error(e):
 
 
 if __name__ == "__main__":
-    print(f"Sirviendo {HTML_FILENAME} en http://localhost:5000/")
+    port = int(os.environ.get("PORT", 5000))
+    print(f"Sirviendo {HTML_FILENAME} en puerto {port}")
     print("Conectado mediante el túnel a Ollama en Cloudflare.")
-    app.run(host="127.0.0.1", port=5000, debug=True, use_reloader=False)
+    app.run(host="0.0.0.0", port=port, debug=True, use_reloader=False)
