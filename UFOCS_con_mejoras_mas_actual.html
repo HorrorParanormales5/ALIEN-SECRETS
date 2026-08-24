@@ -1983,6 +1983,15 @@ function initStopButton() {
 
 async function sendToOllama(userText) {
     const attachment = pendingAttachment;
+
+    // Qwen 2.5 3B es un modelo solo de texto: no puede analizar imágenes.
+    // Avisamos ANTES de mandar nada, para no esperar una petición que sabemos
+    // que va a fallar, y le decimos exactamente qué hacer.
+    if (attachment && attachment.kind === 'image' && OLLAMA_MODEL !== MODEL_GEMMA) {
+        appendMessage('assistant', '📷 El modelo activo (Qwen 2.5 3B) no puede analizar imágenes, solo texto. Abre ⚙️ Configuración y activa Gemma4 26B para analizar esta imagen, y vuelve a intentarlo.');
+        return;
+    }
+
     pendingAttachment = null;
     renderAttachPreview();
 
@@ -2062,7 +2071,10 @@ function buildPrompt(history) {
     const messages = [{ role: 'system', content: systemPrompt }];
     history.slice(-20).forEach(m => {
         const msg = { role: m.role === 'user' ? 'user' : 'assistant', content: m.content };
-        if (m.image) msg.images = [m.image];
+        // Solo mandamos imágenes si el modelo activo las soporta (Gemma4).
+        // Si el turno activo es Qwen (solo texto), las omitimos para no
+        // provocar el error "model does not support multimodal requests".
+        if (m.image && OLLAMA_MODEL === MODEL_GEMMA) msg.images = [m.image];
         messages.push(msg);
     });
     return messages;
@@ -2100,10 +2112,20 @@ async function queryOllama(messages, signal, onDelta) {
         let errMsg = 'Error del servidor de Ollama (' + res.status + ').';
         try {
             const errData = await res.json();
-            if (errData.error) errMsg = errData.error;
+            if (errData && errData.error) {
+                // El error puede venir como string simple (Ollama nativo) o como
+                // objeto { code, message, type } (formato estilo OpenAI). Cubrimos ambos.
+                errMsg = typeof errData.error === 'string'
+                    ? errData.error
+                    : (errData.error.message || JSON.stringify(errData.error));
+            }
         } catch (e) { /* deja el mensaje por defecto */ }
 
-        if (res.status === 404) errMsg = 'Modelo "' + OLLAMA_MODEL + '" no encontrado en Ollama. Corre "ollama list" en tu terminal y confirma que ese tag exista (¿ya hiciste "ollama pull ' + OLLAMA_MODEL + '"?).';
+        if (res.status === 404) {
+            errMsg = 'Modelo "' + OLLAMA_MODEL + '" no encontrado en Ollama. Corre "ollama list" en tu terminal y confirma que ese tag exista (¿ya hiciste "ollama pull ' + OLLAMA_MODEL + '"?).';
+        } else if (/multimodal/i.test(errMsg)) {
+            errMsg = 'El modelo activo (' + OLLAMA_MODEL + ') no puede analizar imágenes. Abre ⚙️ Configuración y activa Gemma4 26B para esto.';
+        }
         throw new Error(errMsg);
     }
 
@@ -2138,7 +2160,10 @@ async function queryOllama(messages, signal, onDelta) {
             if (!trimmed) continue;
             let obj;
             try { obj = JSON.parse(trimmed); } catch (e) { continue; }
-            if (obj.error) throw new Error(obj.error);
+            if (obj.error) {
+                const msg = typeof obj.error === 'string' ? obj.error : (obj.error.message || JSON.stringify(obj.error));
+                throw new Error(/multimodal/i.test(msg) ? 'El modelo activo (' + OLLAMA_MODEL + ') no puede analizar imágenes. Abre ⚙️ Configuración y activa Gemma4 26B para esto.' : msg);
+            }
             if (obj.message && typeof obj.message.content === 'string' && obj.message.content) {
                 fullText += obj.message.content;
                 if (onDelta) onDelta(obj.message.content, fullText);
