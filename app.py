@@ -5,38 +5,51 @@
 # 1) Sirve tu archivo HTML de UFOCS en http://localhost:5000/
 # 2) Recibe las peticiones de chat del navegador en /api/chat
 #    y las reenvía a Ollama (http://localhost:11434/api/chat).
-# 3) Como esta reenvío ocurre servidor-a-servidor (Flask -> Ollama),
-#    NO pasa por CORS del navegador. El navegador solo habla con
-#    Flask, que está en su mismo origen (localhost:5000), así que
-#    tampoco hay bloqueo de ese lado.
+# 3) Servidor de alertas, almacenamiento de usuario e historial.
+# 4) Endpoint /api/cyber-news para alimentar la pestaña de noticias RSS.
 #
 # CÓMO USARLO:
 #   1. Coloca este archivo (app.py) en la MISMA carpeta que tu
 #      archivo HTML de UFOCS.
-#   2. Si tu HTML no se llama "UFOCS_Prueba_5.html", cambia el
+#   2. Si tu HTML no se llama "UFOCS APP.html", cambia el
 #      nombre en la constante HTML_FILENAME más abajo.
 #   3. Instala las dependencias (una sola vez):
-#        pip install flask requests
-#   4. Asegúrate de que Ollama esté corriendo ("ollama serve" en
-#      otra terminal, o ya corriendo como servicio en segundo plano).
+#        pip install flask requests feedparser
+#   4. Asegúrate de que Ollama esté corriendo ("ollama serve").
 #   5. Arranca este servidor:
 #        python app.py
 #   6. Abre en el navegador: http://localhost:5000/
-#      (ya NO abras el HTML con doble clic)
 
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, Response
 import requests
 import os
 import json
 import re
 import time
 import uuid
+import html
+import feedparser
+from werkzeug.exceptions import HTTPException
 
 app = Flask(__name__, static_folder=None)
 
-HTML_FILENAME = "UFOCS_con_mejoras_mas_actual.html"   # <-- cambia esto si tu archivo tiene otro nombre
+HTML_FILENAME = "UFOCS_APP.html"   # <-- cambia esto si tu archivo tiene otro nombre
 OLLAMA_URL = "http://localhost:11434/api/chat"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Reintentos SILENCIOSOS: solo aplican si la conexión con Ollama falla
+# ANTES de que le hayamos mandado ni un solo pedazo de texto al navegador.
+OLLAMA_CHAT_MAX_RETRIES = 3
+OLLAMA_CHAT_RETRY_DELAY = 1.5  # segundos entre reintentos
+
+# ============================================================
+# Feeds RSS de Ciberseguridad
+# ============================================================
+SECURITY_FEEDS = {
+    "The Hacker News": "https://feeds.feedburner.com/TheHackersNews",
+    "BleepingComputer": "https://www.bleepingcomputer.com/feed/",
+    "Dark Reading": "https://www.darkreading.com/rss.xml"
+}
 
 # ============================================================
 # Almacenamiento local (archivos JSON en disco, sin base de datos externa)
@@ -50,6 +63,85 @@ os.makedirs(ALERTS_TXT_DIR, exist_ok=True)
 
 MAX_FIELD_LEN = 4000
 MAX_HISTORY_MESSAGES = 60  # cuántos mensajes recientes se guardan como "memoria"
+
+
+def fetch_cyber_news(limit_per_source=4):
+    """Extrae las noticias más recientes desde las fuentes RSS configuradas.
+
+    ARREGLADO respecto a la versión original:
+    - feedparser.parse(url) NO tiene timeout propio: si un feed se cuelga,
+      esta función (y con ella todo el servidor, si no corre en modo
+      'threaded') se podía quedar colgada indefinidamente. Ahora se
+      descarga primero con requests usando un timeout real, y solo
+      entonces se le pasa el contenido ya descargado a feedparser.
+    - Se extrae una imagen/thumbnail por artículo cuando el feed la trae
+      (media:thumbnail, media:content o enclosure), útil para el carrusel.
+    - Se agrega "summary_text": el resumen sin etiquetas HTML, para
+      mostrarlo limpio en la tarjeta y en el panel lateral.
+    """
+    all_news = []
+    for source_name, url in SECURITY_FEEDS.items():
+        try:
+            resp = requests.get(
+                url,
+                timeout=8,
+                headers={"User-Agent": "UFOCS-CyberNews/1.0"}
+            )
+            resp.raise_for_status()
+            feed = feedparser.parse(resp.content)
+        except Exception as e:
+            app.logger.error(f"Error al obtener noticias de {source_name}: {e}")
+            continue
+
+        for entry in feed.entries[:limit_per_source]:
+            summary_raw = entry.get("summary", "") or ""
+            summary_text = re.sub(r"<[^>]+>", " ", summary_raw)  # quita etiquetas HTML
+            summary_text = html.unescape(summary_text)
+            summary_text = re.sub(r"\s+", " ", summary_text).strip()[:400]
+
+            image_url = None
+            if entry.get("media_thumbnail"):
+                image_url = entry["media_thumbnail"][0].get("url")
+            elif entry.get("media_content"):
+                image_url = entry["media_content"][0].get("url")
+            elif entry.get("links"):
+                for link in entry["links"]:
+                    if str(link.get("type", "")).startswith("image/"):
+                        image_url = link.get("href")
+                        break
+            if not image_url:
+                # último recurso: buscar un <img src="..."> dentro del resumen HTML
+                match = re.search(r'<img[^>]+src="([^"]+)"', summary_raw)
+                if match:
+                    image_url = match.group(1)
+
+            all_news.append({
+                "source": source_name,
+                "title": html.unescape(entry.get("title", "Sin título")),
+                "link": entry.get("link", "#"),
+                "published": entry.get("published", "Reciente"),
+                "summary": summary_raw,
+                "summary_text": summary_text or "Sin descripción disponible.",
+                "image": image_url,
+            })
+
+    return all_news
+
+
+# Caché simple en memoria: evita re-descargar los 3 feeds en cada apertura
+# de la pestaña CyberNews. Se refresca sola cada CYBER_NEWS_CACHE_SECONDS.
+CYBER_NEWS_CACHE_SECONDS = 600  # 10 minutos
+_cyber_news_cache = {"articles": [], "fetched_at": 0}
+
+
+def get_cyber_news_cached():
+    now = time.time()
+    if now - _cyber_news_cache["fetched_at"] > CYBER_NEWS_CACHE_SECONDS or not _cyber_news_cache["articles"]:
+        fresh = fetch_cyber_news()
+        if fresh:  # si todos los feeds fallaron, mejor conservar la caché vieja que dejarla vacía
+            _cyber_news_cache["articles"] = fresh
+            _cyber_news_cache["fetched_at"] = now
+    return _cyber_news_cache["articles"]
 
 
 def _atomic_write_json(path, data):
@@ -130,28 +222,81 @@ def serve_ufocs():
     return send_from_directory(BASE_DIR, HTML_FILENAME)
 
 
+@app.route("/favicon.ico")
+def favicon():
+    # El navegador pide esto solo, sin que nadie lo llame desde el HTML.
+    # Sin esta ruta, cada carga de página generaba un 404 que el manejador
+    # de errores de abajo (antes del arreglo) convertía en un 500 ruidoso
+    # en la terminal. Con esto simplemente se responde "no hay ícono" y
+    # ya, sin ensuciar el log ni disparar el manejador de errores.
+    return "", 204
+
+
+# ============================================================
+# NOTICIAS RSS - Endpoint para el Frontend
+# ============================================================
+@app.route("/api/cyber-news", methods=["GET"])
+def get_cyber_news():
+    news_data = get_cyber_news_cached()
+    return jsonify({
+        "status": "success",
+        "total": len(news_data),
+        "articles": news_data
+    })
+
+
 @app.route("/api/chat", methods=["POST"])
 def proxy_chat():
     body = request.get_json(silent=True)
     if not body:
         return jsonify({"error": "Petición sin cuerpo JSON válido."}), 400
 
-    try:
-        # Sin timeout: modelos grandes (como 26B) pueden tardar varios minutos,
-        # sobre todo la primera vez que se cargan en memoria. Preferimos esperar
-        # a que termine en vez de cortar la respuesta.
-        resp = requests.post(OLLAMA_URL, json=body, timeout=None)
-    except requests.exceptions.ConnectionError:
+    resp = None
+    last_error = None
+    for attempt in range(1, OLLAMA_CHAT_MAX_RETRIES + 1):
+        try:
+            resp = requests.post(OLLAMA_URL, json=body, stream=True, timeout=(10, None))
+            break
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+            last_error = e
+            resp = None
+            if attempt < OLLAMA_CHAT_MAX_RETRIES:
+                time.sleep(OLLAMA_CHAT_RETRY_DELAY)
+                continue
+
+    if resp is None:
         return jsonify({
-            "error": "No se pudo conectar con Ollama en localhost:11434. "
-                     "Verifica que 'ollama serve' esté corriendo."
+            "error": "No se pudo conectar con Ollama en localhost:11434 tras "
+                     f"{OLLAMA_CHAT_MAX_RETRIES} intentos. Verifica que 'ollama serve' "
+                     f"esté corriendo. Detalle: {last_error}"
         }), 502
 
-    # Reenviamos tal cual el status y el cuerpo que devolvió Ollama
-    try:
-        return jsonify(resp.json()), resp.status_code
-    except ValueError:
-        return (resp.text, resp.status_code)
+    if resp.status_code != 200:
+        content_type = resp.headers.get("Content-Type", "application/json")
+        return Response(resp.content, status=resp.status_code, mimetype=content_type)
+
+    def generate():
+        try:
+            for raw_line in resp.iter_lines():
+                if not raw_line:
+                    continue
+                line = raw_line.decode("utf-8", errors="replace") if isinstance(raw_line, bytes) else raw_line
+                yield line + "\n"
+        except (requests.exceptions.ChunkedEncodingError,
+                requests.exceptions.ConnectionError,
+                requests.exceptions.ReadTimeout):
+            yield json.dumps({
+                "error": "La conexión con Ollama se interrumpió a mitad de la respuesta. Vuelve a preguntar."
+            }) + "\n"
+        except Exception as e:
+            app.logger.exception("Error inesperado durante el streaming de /api/chat")
+            yield json.dumps({
+                "error": f"Error inesperado del servidor al leer la respuesta de Ollama: {e}"
+            }) + "\n"
+        finally:
+            resp.close()
+
+    return Response(generate(), mimetype="application/x-ndjson")
 
 
 # ============================================================
@@ -191,7 +336,6 @@ def save_alert():
 
     if alert_id:
         existing = next((a for a in alerts if a.get("id") == alert_id), None)
-        # Solo se puede editar si eres el dueño (alerta "user") o si es "general"
         if existing and (existing.get("scope") == "general" or existing.get("owner") == username):
             existing.update({
                 "name": name,
@@ -263,20 +407,131 @@ def save_history():
     if not username:
         return jsonify({"error": "username requerido"}), 400
     history = body.get("history") or []
-    history = history[-MAX_HISTORY_MESSAGES:]  # evita que crezca sin límite
+    history = history[-MAX_HISTORY_MESSAGES:]
     path = os.path.join(HISTORY_DIR, _safe_username_key(username) + ".json")
     _atomic_write_json(path, history)
+    _write_user_history_txt(username, history)
     return jsonify({"saved": True})
 
 
 # ============================================================
-# Manejo de errores: SIEMPRE devolvemos JSON, nunca una página HTML de
-# error. Si no hiciéramos esto, un error inesperado en el servidor
-# rompería el .json() del navegador y el chat mostraría un mensaje
-# genérico sin decir qué pasó realmente.
+# USUARIOS — carpeta y "base de datos" por usuario
+# ============================================================
+USERS_DIR = os.path.join(DATA_DIR, "usuarios")
+os.makedirs(USERS_DIR, exist_ok=True)
+
+
+def _user_folder(username):
+    folder = os.path.join(USERS_DIR, _safe_username_key(username))
+    os.makedirs(folder, exist_ok=True)
+    return folder
+
+
+def _credentials_path(username):
+    return os.path.join(_user_folder(username), "credenciales.txt")
+
+
+def _write_credentials(username, password, display_name=None):
+    path = _credentials_path(username)
+    lines = [
+        "UFOCS - Credenciales de usuario",
+        "=" * 50,
+        "Usuario: " + (display_name or username),
+        "Contraseña: " + password,
+        "Creado: " + time.strftime("%Y-%m-%d %H:%M:%S"),
+        "=" * 50,
+    ]
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("\r\n".join(lines))
+
+
+def _read_credentials(username):
+    path = _credentials_path(username)
+    if not os.path.exists(path):
+        return None
+    with open(path, "r", encoding="utf-8") as f:
+        content = f.read()
+    match = re.search(r"Contrase\u00f1a:\s*(.*)", content)
+    return match.group(1).strip() if match else None
+
+
+def _write_user_history_txt(username, history):
+    try:
+        folder = _user_folder(username)
+        path = os.path.join(folder, "historial_chat.txt")
+        lines = [
+            "UFOCS - Historial de chat de: " + username,
+            "Actualizado: " + time.strftime("%Y-%m-%d %H:%M:%S"),
+            "=" * 50,
+            "",
+        ]
+        for msg in history:
+            role = "Usuario" if msg.get("role") == "user" else "UFOCS"
+            content = msg.get("content") or ""
+            lines.append(f"[{role}]")
+            lines.append(content)
+            lines.append("-" * 50)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write("\r\n".join(lines))
+    except OSError:
+        pass
+
+
+@app.route("/api/register", methods=["POST"])
+def register_user():
+    body = request.get_json(silent=True) or {}
+    username = (body.get("username") or "").strip()
+    password = body.get("password") or ""
+    if not username or not password:
+        return jsonify({"error": "username y password son requeridos"}), 400
+
+    cred_path = _credentials_path(username)
+    is_new = not os.path.exists(cred_path)
+    _write_credentials(username, password, body.get("displayName"))
+    return jsonify({"created": is_new, "folder": _user_folder(username)})
+
+
+@app.route("/api/login", methods=["POST"])
+def login_user():
+    body = request.get_json(silent=True) or {}
+    username = (body.get("username") or "").strip()
+    password = body.get("password") or ""
+    stored = _read_credentials(username)
+    if stored is None:
+        return jsonify({"ok": False, "error": "Usuario no encontrado en el servidor"}), 404
+    if stored != password:
+        return jsonify({"ok": False, "error": "Contraseña incorrecta"}), 401
+    return jsonify({"ok": True})
+
+
+@app.route("/api/users", methods=["GET"])
+def list_users():
+    users = []
+    if os.path.isdir(USERS_DIR):
+        for key in sorted(os.listdir(USERS_DIR)):
+            cred_path = os.path.join(USERS_DIR, key, "credenciales.txt")
+            if os.path.exists(cred_path):
+                with open(cred_path, "r", encoding="utf-8") as f:
+                    raw = f.read()
+                users.append({"username": key, "credentials_file": cred_path, "raw": raw})
+    return jsonify({"users": users})
+
+
+# ============================================================
+# Manejo de errores
 # ============================================================
 @app.errorhandler(Exception)
 def handle_any_error(e):
+    # BUG ARREGLADO: antes, cualquier 404 (por ejemplo pedir una ruta que
+    # no existe, o el favicon.ico) caía en este mismo manejador genérico y
+    # se convertía en un 500 "Error interno del servidor", con traceback
+    # completo en la terminal, aunque en realidad no había ningún error
+    # real: solo una URL que no existe. Ahora los errores HTTP normales
+    # (404 Not Found, 405 Method Not Allowed, etc.) se dejan pasar tal
+    # cual son, con su código real, y sin ensuciar el log. Solo los
+    # errores inesperados de verdad siguen cayendo aquí como 500.
+    if isinstance(e, HTTPException):
+        return e
     app.logger.exception("Error no manejado")
     return jsonify({"error": f"Error interno del servidor: {e}"}), 500
 
@@ -284,9 +539,10 @@ def handle_any_error(e):
 if __name__ == "__main__":
     print(f"Sirviendo {HTML_FILENAME} en http://localhost:5000/")
     print("Asegúrate de que Ollama esté corriendo (ollama serve).")
-    # use_reloader=False: el recargador automático de Flask puede reiniciar
-    # el proceso a mitad de una petición (por ejemplo justo cuando se está
-    # guardando una alerta), cortando la conexión y provocando errores
-    # intermitentes en el navegador. Lo desactivamos para que el servidor
-    # sea estable; si editas app.py, reinícialo tú manualmente.
-    app.run(host="127.0.0.1", port=5000, debug=True, use_reloader=False)
+    # threaded=True: SIN esto, el servidor de desarrollo de Flask atiende
+    # una sola petición a la vez. Como /api/chat mantiene la conexión
+    # abierta mientras Ollama genera texto (a veces varios minutos), sin
+    # threading esa espera bloquearía TODO lo demás (login, alertas,
+    # CyberNews, historial) hasta que esa respuesta terminara. Con
+    # threading, cada petición corre en su propio hilo.
+    app.run(host="127.0.0.1", port=5000, debug=True, use_reloader=False, threaded=True)
