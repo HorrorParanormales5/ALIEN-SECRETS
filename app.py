@@ -34,7 +34,11 @@ from werkzeug.exceptions import HTTPException
 app = Flask(__name__, static_folder=None)
 
 HTML_FILENAME = "UFOCS_APP.html"   # <-- cambia esto si tu archivo tiene otro nombre
-OLLAMA_URL = "http://localhost:11434/api/chat"
+
+# Lee la URL de Render (Environment) o usa localhost como respaldo local
+OLLAMA_BASE = os.environ.get("OLLAMA_URL", "http://localhost:11434").rstrip("/")
+OLLAMA_URL = f"{OLLAMA_BASE}/api/chat"
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Reintentos SILENCIOSOS: solo aplican si la conexión con Ollama falla
@@ -66,19 +70,7 @@ MAX_HISTORY_MESSAGES = 60  # cuántos mensajes recientes se guardan como "memori
 
 
 def fetch_cyber_news(limit_per_source=4):
-    """Extrae las noticias más recientes desde las fuentes RSS configuradas.
-
-    ARREGLADO respecto a la versión original:
-    - feedparser.parse(url) NO tiene timeout propio: si un feed se cuelga,
-      esta función (y con ella todo el servidor, si no corre en modo
-      'threaded') se podía quedar colgada indefinidamente. Ahora se
-      descarga primero con requests usando un timeout real, y solo
-      entonces se le pasa el contenido ya descargado a feedparser.
-    - Se extrae una imagen/thumbnail por artículo cuando el feed la trae
-      (media:thumbnail, media:content o enclosure), útil para el carrusel.
-    - Se agrega "summary_text": el resumen sin etiquetas HTML, para
-      mostrarlo limpio en la tarjeta y en el panel lateral.
-    """
+    """Extrae las noticias más recientes desde las fuentes RSS configuradas."""
     all_news = []
     for source_name, url in SECURITY_FEEDS.items():
         try:
@@ -95,7 +87,7 @@ def fetch_cyber_news(limit_per_source=4):
 
         for entry in feed.entries[:limit_per_source]:
             summary_raw = entry.get("summary", "") or ""
-            summary_text = re.sub(r"<[^>]+>", " ", summary_raw)  # quita etiquetas HTML
+            summary_text = re.sub(r"<[^>]+>", " ", summary_raw)
             summary_text = html.unescape(summary_text)
             summary_text = re.sub(r"\s+", " ", summary_text).strip()[:400]
 
@@ -110,7 +102,6 @@ def fetch_cyber_news(limit_per_source=4):
                         image_url = link.get("href")
                         break
             if not image_url:
-                # último recurso: buscar un <img src="..."> dentro del resumen HTML
                 match = re.search(r'<img[^>]+src="([^"]+)"', summary_raw)
                 if match:
                     image_url = match.group(1)
@@ -128,9 +119,7 @@ def fetch_cyber_news(limit_per_source=4):
     return all_news
 
 
-# Caché simple en memoria: evita re-descargar los 3 feeds en cada apertura
-# de la pestaña CyberNews. Se refresca sola cada CYBER_NEWS_CACHE_SECONDS.
-CYBER_NEWS_CACHE_SECONDS = 600  # 10 minutos
+CYBER_NEWS_CACHE_SECONDS = 600
 _cyber_news_cache = {"articles": [], "fetched_at": 0}
 
 
@@ -138,16 +127,13 @@ def get_cyber_news_cached():
     now = time.time()
     if now - _cyber_news_cache["fetched_at"] > CYBER_NEWS_CACHE_SECONDS or not _cyber_news_cache["articles"]:
         fresh = fetch_cyber_news()
-        if fresh:  # si todos los feeds fallaron, mejor conservar la caché vieja que dejarla vacía
+        if fresh:
             _cyber_news_cache["articles"] = fresh
             _cyber_news_cache["fetched_at"] = now
     return _cyber_news_cache["articles"]
 
 
 def _atomic_write_json(path, data):
-    """Escribe un archivo JSON de forma atómica (a un temporal y luego renombra),
-    para que una petición a medias o un reinicio del servidor nunca deje el
-    archivo corrupto o a medio escribir."""
     tmp_path = path + ".tmp"
     with open(tmp_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
@@ -160,8 +146,6 @@ def _safe_filename(text):
 
 
 def _write_alert_txt(alert):
-    """Guarda/actualiza una copia legible en texto plano (estilo Notepad) de la
-    alerta, además del JSON. Sirve como respaldo de recursos fácil de abrir."""
     filename = _safe_filename(alert.get("name")) + "_" + alert.get("id", "")[:8] + ".txt"
     path = os.path.join(ALERTS_TXT_DIR, filename)
     lines = [
@@ -224,11 +208,6 @@ def serve_ufocs():
 
 @app.route("/favicon.ico")
 def favicon():
-    # El navegador pide esto solo, sin que nadie lo llame desde el HTML.
-    # Sin esta ruta, cada carga de página generaba un 404 que el manejador
-    # de errores de abajo (antes del arreglo) convertía en un 500 ruidoso
-    # en la terminal. Con esto simplemente se responde "no hay ícono" y
-    # ya, sin ensuciar el log ni disparar el manejador de errores.
     return "", 204
 
 
@@ -266,8 +245,8 @@ def proxy_chat():
 
     if resp is None:
         return jsonify({
-            "error": "No se pudo conectar con Ollama en localhost:11434 tras "
-                     f"{OLLAMA_CHAT_MAX_RETRIES} intentos. Verifica que 'ollama serve' "
+            "error": "No se pudo conectar con Ollama tras "
+                     f"{OLLAMA_CHAT_MAX_RETRIES} intentos. Verifica que Ollama "
                      f"esté corriendo. Detalle: {last_error}"
         }), 502
 
@@ -522,14 +501,6 @@ def list_users():
 # ============================================================
 @app.errorhandler(Exception)
 def handle_any_error(e):
-    # BUG ARREGLADO: antes, cualquier 404 (por ejemplo pedir una ruta que
-    # no existe, o el favicon.ico) caía en este mismo manejador genérico y
-    # se convertía en un 500 "Error interno del servidor", con traceback
-    # completo en la terminal, aunque en realidad no había ningún error
-    # real: solo una URL que no existe. Ahora los errores HTTP normales
-    # (404 Not Found, 405 Method Not Allowed, etc.) se dejan pasar tal
-    # cual son, con su código real, y sin ensuciar el log. Solo los
-    # errores inesperados de verdad siguen cayendo aquí como 500.
     if isinstance(e, HTTPException):
         return e
     app.logger.exception("Error no manejado")
@@ -539,10 +510,4 @@ def handle_any_error(e):
 if __name__ == "__main__":
     print(f"Sirviendo {HTML_FILENAME} en http://localhost:5000/")
     print("Asegúrate de que Ollama esté corriendo (ollama serve).")
-    # threaded=True: SIN esto, el servidor de desarrollo de Flask atiende
-    # una sola petición a la vez. Como /api/chat mantiene la conexión
-    # abierta mientras Ollama genera texto (a veces varios minutos), sin
-    # threading esa espera bloquearía TODO lo demás (login, alertas,
-    # CyberNews, historial) hasta que esa respuesta terminara. Con
-    # threading, cada petición corre en su propio hilo.
     app.run(host="127.0.0.1", port=5000, debug=True, use_reloader=False, threaded=True)
