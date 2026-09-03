@@ -33,7 +33,7 @@ from werkzeug.exceptions import HTTPException
 
 app = Flask(__name__, static_folder=None)
 
-HTML_FILENAME = "UFOCS_APP.html"   # <-- cambia esto si tu archivo tiene otro nombre
+HTML_FILENAME = "UFOCS_con_mejoras_mas_actual.html"   # <-- cambia esto si tu archivo tiene otro nombre
 
 # Lee la URL de Render (Environment) o usa localhost como respaldo local
 OLLAMA_BASE = os.environ.get("OLLAMA_URL", "http://localhost:11434").rstrip("/")
