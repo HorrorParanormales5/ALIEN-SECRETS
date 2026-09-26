@@ -500,6 +500,7 @@ body.chat-active {
     gap: 12px;
 }
 .chat-bubble {
+    position: relative;
     max-width: 78%;
     padding: 12px 15px;
     border-radius: 16px;
@@ -510,6 +511,31 @@ body.chat-active {
     animation: fadeInUp 0.25s ease;
     box-shadow: 0 2px 10px rgba(0,0,0,0.18);
 }
+.chat-copy-btn {
+    position: absolute;
+    bottom: -10px;
+    right: -8px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--panel-bg);
+    border: 1px solid var(--input-border);
+    color: var(--text-faint, #8a8d93);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(2px);
+    transition: opacity 0.15s ease, transform 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.chat-bubble.assistant:hover .chat-copy-btn,
+.chat-copy-btn.copied {
+    opacity: 1;
+    transform: translateY(0);
+}
+.chat-copy-btn:hover { border-color: var(--green); color: var(--green); }
+.chat-copy-btn.copied { border-color: var(--green); color: var(--green-bright); }
 .chat-bubble.user {
     align-self: flex-end;
     background: linear-gradient(135deg, var(--green-dark), #175634);
@@ -986,9 +1012,9 @@ body.chat-active {
 .cn-stage {
     flex: 1;
     height: 100%;
-    max-height: 380px;
+    max-height: 560px;
     position: relative;
-    perspective: 1300px;
+    perspective: 1600px;
     perspective-origin: 50% 50%;
     overflow: hidden;
 }
@@ -1001,10 +1027,10 @@ body.chat-active {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 220px;
-    height: 300px;
-    margin: -150px 0 0 -110px;
-    border-radius: 16px;
+    width: 320px;
+    height: 440px;
+    margin: -220px 0 0 -160px;
+    border-radius: 18px;
     overflow: hidden;
     cursor: pointer;
     background: var(--input-bg);
@@ -1027,21 +1053,59 @@ body.chat-active {
     flex-shrink: 0;
 }
 .cn-card-image.no-image { display: flex; align-items: center; justify-content: center; font-size: 34px; }
-.cn-card-body { padding: 12px 13px; display: flex; flex-direction: column; gap: 6px; min-height: 0; flex: 1; }
+.cn-card-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; min-height: 0; flex: 1; }
 .cn-card-source {
-    font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+    font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.6px;
     color: var(--green-bright); font-weight: 600;
 }
 .cn-card-title {
-    font-size: 13px; line-height: 1.35; color: var(--text-main);
-    display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;
+    font-size: 16px; line-height: 1.4; color: var(--text-main); font-weight: 500;
+    display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical;
     overflow: hidden;
 }
-.cn-card-date { font-size: 10.5px; color: var(--text-faint); margin-top: auto; }
+.cn-card-date { font-size: 12px; color: var(--text-faint); margin-top: auto; }
+
+/* ---------- Tarjeta especial: Biografía de Gibrann Abdala ---------- */
+.cn-card.cn-bio-card {
+    border: 1px solid var(--green);
+    background: linear-gradient(160deg, rgba(52,214,122,0.14), var(--input-bg) 55%);
+}
+.cn-card.cn-bio-card .cn-card-image { object-position: center 20%; }
+.cn-card.cn-bio-card .cn-card-source::before { content: '👽 '; }
+.cn-bio-badge {
+    position: absolute; top: 12px; right: 12px; z-index: 2;
+    background: rgba(10,14,12,0.78); border: 1px solid var(--green); color: var(--green-bright);
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase;
+    padding: 4px 9px; border-radius: 999px; backdrop-filter: blur(4px);
+}
+.cn-card-excerpt {
+    font-size: 13px; line-height: 1.5; color: var(--text-muted);
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.cn-offline-note {
+    display: none; align-items: center; gap: 6px;
+    font-size: 11.5px; color: var(--text-faint);
+    border: 1px dashed var(--input-border); border-radius: 999px; padding: 3px 10px;
+}
+.cybernews-body.cn-offline .cn-offline-note { display: inline-flex; }
+.cn-autoplay-bar {
+    height: 2px; margin: 0 auto; width: min(320px, 60%); background: var(--input-border);
+    border-radius: 2px; overflow: hidden; flex-shrink: 0;
+}
+.cn-autoplay-bar > span {
+    display: block; height: 100%; width: 0; background: var(--green);
+}
+.cn-autoplay-bar.running > span { animation: cnAutoplayFill var(--cn-autoplay-ms, 5000ms) linear forwards; }
+.cn-autoplay-bar.paused > span { animation-play-state: paused; }
+@keyframes cnAutoplayFill { from { width: 0; } to { width: 100%; } }
+.cn-carousel-wrap.single .cn-nav { visibility: hidden; }
+#cnDetailSummary.cn-bio-text p { margin: 0 0 14px; }
+.cn-detail-image-wrap.cn-bio-photo { height: 320px; }
+.cn-detail-image-wrap.cn-bio-photo img { object-position: center 20%; }
 
 .cn-nav {
     background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-main);
-    width: 38px; height: 38px; border-radius: 50%; font-size: 20px; cursor: pointer;
+    width: 44px; height: 44px; border-radius: 50%; font-size: 24px; cursor: pointer;
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     transition: border-color 0.15s ease, color 0.15s ease;
 }
@@ -1103,7 +1167,8 @@ body.chat-active {
 
 @media (max-width: 720px) {
     .cybernews-body.split .cn-stage-col { display: none; }
-    .cn-card { width: 168px; height: 240px; margin: -120px 0 0 -84px; }
+    .cn-card { width: 230px; height: 330px; margin: -165px 0 0 -115px; }
+    .cn-card-title { font-size: 14px; }
 }
 .alerts-list-header {
     display: flex; align-items: center; justify-content: space-between;
@@ -1321,25 +1386,304 @@ body.chat-active #binaryPlanetCanvas { display: block; opacity: 0.16; }
 /* ---------- Transición fluida entre las pestañas Chat / Alerts / CyberNews ---------- */
 .chat-view-body,
 .alerts-body,
-.cybernews-body {
+.cybernews-body,
+.smartnote-body {
     transition: opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1), transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
     opacity: 1;
     transform: translateY(0) scale(1);
 }
 .chat-view-body.view-fade-out,
 .alerts-body.view-fade-out,
-.cybernews-body.view-fade-out {
+.cybernews-body.view-fade-out,
+.smartnote-body.view-fade-out {
     opacity: 0;
     transform: translateY(10px) scale(0.985);
     pointer-events: none;
 }
 .chat-view-body.view-fade-in-start,
 .alerts-body.view-fade-in-start,
-.cybernews-body.view-fade-in-start {
+.cybernews-body.view-fade-in-start,
+.smartnote-body.view-fade-in-start {
     opacity: 0 !important;
     transform: translateY(-8px) scale(0.985) !important;
     transition: none !important;
 }
+
+/* ---------- SMART NOTE (estilo OneNote) ---------- */
+.smartnote-body { flex: 1; display: none; overflow: hidden; }
+.smartnote-body.active { display: flex; }
+.sn-pages-col {
+    width: 260px; min-width: 200px; flex-shrink: 0;
+    border-right: 1px solid var(--input-border, rgba(255,255,255,0.08));
+    display: flex; flex-direction: column; overflow: hidden;
+    background: var(--panel-bg);
+}
+.sn-pages-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 14px 10px; }
+.sn-pages-header h3 { font-size: 15px; color: var(--text-main); margin: 0; }
+.sn-pages-header button {
+    background: var(--green-dark); border: 1px solid var(--green); color: var(--text-main);
+    border-radius: 6px; padding: 5px 9px; font-size: 12px; cursor: pointer;
+}
+.sn-pages-header button:hover { background: var(--green-dark-hover); }
+
+.sn-search-box {
+    display: flex; align-items: center; gap: 6px;
+    margin: 0 12px 8px; padding: 6px 10px;
+    background: var(--input-bg, rgba(255,255,255,0.04));
+    border: 1px solid var(--input-border, rgba(255,255,255,0.08));
+    border-radius: 8px; color: var(--text-faint, #8a8d93);
+}
+.sn-search-box input {
+    flex: 1; background: transparent; border: none; outline: none;
+    color: var(--text-main); font-size: 12.5px;
+}
+.sn-search-results {
+    display: none; flex-direction: column; gap: 2px;
+    margin: 0 8px 8px; max-height: 180px; overflow-y: auto;
+    border-bottom: 1px solid var(--input-border, rgba(255,255,255,0.08)); padding-bottom: 8px;
+}
+.sn-search-results.active { display: flex; }
+.sn-search-result-item {
+    padding: 6px 8px; border-radius: 6px; cursor: pointer; font-size: 12px;
+    color: var(--text-main);
+}
+.sn-search-result-item:hover { background: rgba(52,214,122,0.1); }
+.sn-search-result-item .sn-sr-title { font-weight: 600; color: var(--green-bright); }
+.sn-search-result-item .sn-sr-snippet { color: var(--text-faint, #8a8d93); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sn-search-empty { padding: 6px 8px; font-size: 12px; color: var(--text-faint, #8a8d93); }
+
+.sn-pages-tree { flex: 1; overflow-y: auto; padding: 4px 8px 14px; }
+.sn-page-item {
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 8px; border-radius: 6px; cursor: pointer;
+    color: var(--text-main); font-size: 13px; margin-bottom: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sn-page-item:hover { background: rgba(52,214,122,0.08); }
+.sn-page-item.active { background: rgba(52,214,122,0.14); color: var(--green-bright); }
+.sn-page-item .sn-page-icon { flex-shrink: 0; opacity: 0.8; }
+.sn-page-item .sn-page-title { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+.sn-page-toggle {
+    flex-shrink: 0; width: 14px; height: 14px; display: flex; align-items: center; justify-content: center;
+    color: var(--text-faint, #8a8d93); transition: transform 0.15s ease; cursor: pointer;
+}
+.sn-page-toggle.expanded { transform: rotate(90deg); }
+.sn-page-toggle-placeholder { flex-shrink: 0; width: 14px; }
+
+.sn-editor-col { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+.sn-editor-empty {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    color: var(--text-faint, #8a8d93); font-size: 13px; text-align: center; padding: 20px;
+}
+.sn-editor-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+.sn-editor-toolbar {
+    display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+    border-bottom: 1px solid var(--input-border, rgba(255,255,255,0.08)); flex-wrap: wrap;
+}
+.sn-page-title-input {
+    flex: 1; min-width: 160px; background: transparent; border: none; outline: none;
+    color: var(--text-main); font-size: 17px; font-weight: 600; font-family: var(--font-display);
+}
+.sn-toolbar-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.sn-toolbar-actions button {
+    background: transparent; border: 1px solid rgba(255,255,255,0.12); color: var(--text-main);
+    border-radius: 6px; width: 30px; height: 30px; cursor: pointer; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease, transform 0.08s ease;
+}
+.sn-toolbar-actions button:hover,
+.sn-toolbar-actions button.active { border-color: var(--green); color: var(--green); background: rgba(52,214,122,0.08); }
+.sn-toolbar-actions button:active { transform: scale(0.92); }
+.sn-toolbar-actions button.sn-save-doc-btn {
+    width: auto; height: 32px; padding: 0 12px; gap: 6px;
+    background: var(--green-dark); border-color: var(--green); color: var(--text-main);
+    font-size: 12.5px; font-weight: 600; white-space: nowrap;
+}
+.sn-toolbar-actions button.sn-save-doc-btn:hover { background: var(--green-dark-hover); color: var(--text-main); }
+.sn-toolbar-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.1); margin: 0 2px; }
+
+/* --------- Segunda barra: formato de texto tipo Word --------- */
+.sn-format-toolbar {
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    padding: 8px 16px; border-bottom: 1px solid var(--input-border, rgba(255,255,255,0.08));
+}
+.sn-format-toolbar select {
+    background: var(--input-bg, rgba(255,255,255,0.04)); border: 1px solid rgba(255,255,255,0.14);
+    color: var(--text-main); border-radius: 6px; padding: 5px 6px; font-size: 12px; cursor: pointer;
+    max-width: 130px;
+}
+.sn-format-toolbar button {
+    background: transparent; border: 1px solid rgba(255,255,255,0.12); color: var(--text-main);
+    border-radius: 6px; width: 28px; height: 28px; cursor: pointer; font-size: 12.5px;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease, transform 0.08s ease;
+}
+.sn-format-toolbar button:hover,
+.sn-format-toolbar button.active { border-color: var(--green); color: var(--green); background: rgba(52,214,122,0.08); }
+.sn-format-toolbar button:active { transform: scale(0.9); }
+.sn-format-toolbar input[type="color"] {
+    width: 28px; height: 28px; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px;
+    background: none; padding: 2px; cursor: pointer;
+}
+.sn-highlight-swatches { display: flex; align-items: center; gap: 5px; }
+.sn-highlight-swatch {
+    width: 20px; height: 20px; border-radius: 50%; cursor: pointer;
+    border: 2px solid rgba(255,255,255,0.18); padding: 0; transition: transform 0.1s ease, border-color 0.1s ease;
+}
+.sn-highlight-swatch:hover { transform: scale(1.15); border-color: var(--green); }
+.sn-highlight-swatch.sn-highlight-none {
+    background: transparent; color: var(--text-faint, #8a8d93); font-size: 10px;
+    display: flex; align-items: center; justify-content: center;
+}
+
+.sn-dropdown-wrap { position: relative; }
+.sn-dropdown-panel {
+    /* Popup animado: en vez de display:none/block (que no se puede animar),
+       usamos opacidad + escala para un efecto suave y profesional. */
+    position: absolute; top: 36px; right: 0; z-index: 500;
+    background: var(--panel-bg); border: 1px solid var(--input-border, rgba(255,255,255,0.1));
+    border-radius: 10px; padding: 14px; width: 260px; box-shadow: 0 14px 34px rgba(0,0,0,0.45);
+    box-sizing: border-box;
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transform: scale(0.94) translateY(-6px); transform-origin: top right;
+    transition: opacity 0.16s ease, transform 0.16s cubic-bezier(0.2,0.8,0.3,1), visibility 0s linear 0.16s;
+}
+.sn-dropdown-panel.open {
+    opacity: 1; visibility: visible; pointer-events: auto;
+    transform: scale(1) translateY(0);
+    transition: opacity 0.16s ease, transform 0.16s cubic-bezier(0.2,0.8,0.3,1);
+}
+.sn-dropdown-panel-sm { width: 200px; }
+#snDrawPanel { width: 300px; }
+.sn-dd-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-faint, #8a8d93); margin: 10px 0 8px; }
+.sn-dd-title:first-child { margin-top: 0; }
+
+/* Herramientas de dibujo: SOLO ícono (sin texto) para que nunca se corten */
+.sn-draw-tools-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+.sn-draw-tool, .sn-shape-btn {
+    background: transparent; border: 1px solid rgba(255,255,255,0.12); color: var(--text-main);
+    border-radius: 8px; width: 42px; height: 38px; font-size: 17px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease, transform 0.08s ease;
+}
+.sn-draw-tool:hover, .sn-draw-tool.active, .sn-shape-btn:hover { border-color: var(--green); color: var(--green); background: rgba(52,214,122,0.08); }
+.sn-draw-tool:active, .sn-shape-btn:active { transform: scale(0.92); }
+.sn-draw-row {
+    display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 6px 10px;
+    margin-bottom: 6px; font-size: 11px; color: var(--text-faint, #8a8d93);
+}
+.sn-draw-row input[type="range"] { width: 100%; }
+.sn-draw-row input[type="color"] { width: 30px; height: 24px; border: none; background: none; padding: 0; cursor: pointer; }
+.sn-draw-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; }
+.sn-draw-actions button {
+    background: var(--green-dark); border: 1px solid var(--green); color: var(--text-main);
+    border-radius: 6px; padding: 7px 8px; font-size: 11.5px; cursor: pointer;
+    transition: background 0.12s ease, transform 0.08s ease;
+}
+.sn-draw-actions button:hover { background: var(--green-dark-hover); }
+.sn-draw-actions button:active { transform: scale(0.96); }
+
+.sn-bg-swatches { display: flex; gap: 10px; }
+.sn-bg-swatch { width: 32px; height: 32px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: border-color 0.12s ease; }
+.sn-bg-swatch:hover, .sn-bg-swatch.active { border-color: var(--green); }
+.sn-bg-dark { background: #14161a; }
+.sn-bg-light { background: #ffffff; }
+
+.sn-download-panel button, #snDownloadPanel button {
+    display: block; width: 100%; text-align: left; background: transparent;
+    border: none; color: var(--text-main); padding: 7px 6px; border-radius: 6px;
+    font-size: 12.5px; cursor: pointer; transition: background 0.12s ease, color 0.12s ease;
+}
+#snDownloadPanel button:hover { background: rgba(52,214,122,0.1); color: var(--green-bright); }
+
+.sn-editor-content-wrap { position: relative; flex: 1; overflow: hidden; display: flex; }
+.sn-editor-content {
+    flex: 1; overflow: auto; padding: 18px 22px; color: var(--text-main);
+    font-size: 14.5px; line-height: 1.6; outline: none; position: relative;
+    background: transparent; transition: background 0.15s ease, color 0.15s ease;
+}
+.sn-editor-content:empty::before { content: attr(placeholder); color: var(--text-faint, #8a8d93); }
+.sn-editor-content a { color: var(--green-bright); text-decoration: underline; }
+.sn-editor-content.sn-theme-light { background: #ffffff; color: #1b1b1b; }
+.sn-editor-content.sn-theme-light a { color: #1a56db; }
+
+/* --------- Imágenes / formas / dibujos / cuadros de texto "libres":
+   se pueden mover y redimensionar a cualquier parte de la hoja, en
+   cualquier proporción --------- */
+.sn-img-frame, .sn-text-frame {
+    display: inline-block; position: absolute; box-sizing: border-box;
+    min-width: 30px; min-height: 30px; cursor: move;
+}
+.sn-img-frame img {
+    width: 100%; height: 100%; display: block; border-radius: 6px;
+    -webkit-user-drag: none; user-select: none; pointer-events: none;
+}
+.sn-img-frame.sn-img-selected, .sn-text-frame.sn-img-selected { outline: 2px solid var(--green); outline-offset: 2px; }
+.sn-text-frame {
+    background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.18); border-radius: 6px;
+}
+.sn-text-frame-inner {
+    width: 100%; height: 100%; padding: 6px 8px; box-sizing: border-box;
+    outline: none; cursor: text; overflow: auto; color: inherit; font-size: inherit;
+}
+.sn-text-frame-inner:empty::before { content: 'Escribe aquí...'; color: var(--text-faint, #8a8d93); }
+/* Barra para mover el cuadro de texto: aparece al pasar el mouse o al
+   seleccionarlo, arriba del cuadro. Se arrastra a cualquier parte. */
+.sn-text-frame-bar {
+    position: absolute; left: 0; right: 0; top: -24px; height: 22px; z-index: 6;
+    display: flex; align-items: center; gap: 6px; padding: 0 8px;
+    background: var(--green-dark); color: #fff; border: 1px solid var(--green);
+    border-radius: 6px 6px 0 0; font-size: 11px; font-family: var(--font-body);
+    cursor: grab; user-select: none; touch-action: none;
+    opacity: 0; pointer-events: none; transition: opacity 0.15s ease;
+}
+.sn-text-frame-bar b { font-size: 12px; letter-spacing: 1px; }
+.sn-text-frame-bar .sn-tf-del {
+    margin-left: auto; cursor: pointer; opacity: 0.8; padding: 0 3px; border-radius: 4px;
+}
+.sn-text-frame-bar .sn-tf-del:hover { opacity: 1; background: rgba(0,0,0,0.3); }
+.sn-text-frame:hover .sn-text-frame-bar,
+.sn-text-frame.sn-img-selected .sn-text-frame-bar { opacity: 1; pointer-events: auto; }
+.sn-text-frame.sn-tf-dragging .sn-text-frame-bar { cursor: grabbing; }
+.sn-text-frame.sn-tf-dragging { box-shadow: 0 12px 28px rgba(0,0,0,0.35); }
+.sn-text-frame:hover { border-color: var(--green); }
+.sn-img-resize-handle {
+    display: none; position: absolute; right: -7px; bottom: -7px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--green); border: 2px solid var(--panel-bg); cursor: nwse-resize; z-index: 5;
+}
+.sn-img-frame.sn-img-selected .sn-img-resize-handle,
+.sn-text-frame.sn-img-selected .sn-img-resize-handle { display: block; }
+/* "Agarradera" siempre visible y siempre clicable, incluso si la imagen
+   está enviada detrás del texto (donde un click normal ya no la alcanza) */
+.sn-img-grab-handle {
+    position: absolute; left: -9px; top: -9px; width: 18px; height: 18px; z-index: 6;
+    border-radius: 50%; background: var(--panel-bg); border: 1px solid var(--green);
+    color: var(--green); font-size: 10px; display: flex; align-items: center; justify-content: center;
+    cursor: grab; opacity: 0.55; transition: opacity 0.12s ease;
+}
+.sn-img-grab-handle:hover { opacity: 1; }
+
+#snDrawCanvas {
+    display: none; position: absolute; inset: 0; z-index: 45;
+    cursor: crosshair; touch-action: none;
+}
+#snDrawCanvas.active { display: block; }
+
+.sn-image-toolbar {
+    display: none; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 8px 22px; border-top: 1px solid var(--input-border, rgba(255,255,255,0.08));
+    font-size: 11px; color: var(--text-faint, #8a8d93);
+}
+.sn-image-toolbar.active { display: flex; }
+.sn-image-toolbar input[type="range"] { width: 80px; }
+.sn-image-toolbar button {
+    background: transparent; border: 1px solid rgba(255,255,255,0.12); color: var(--text-main);
+    border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer;
+}
+.sn-image-toolbar button:hover { border-color: var(--green); color: var(--green); }
+
+.sn-save-status { padding: 4px 22px 10px; font-size: 11px; color: var(--text-faint, #8a8d93); }
 .chat-hero {
     position: absolute;
     inset: 0;
@@ -1412,6 +1756,88 @@ body.chat-active #binaryPlanetCanvas { display: block; opacity: 0.16; }
     font-size: 13px;
 }
 .chat-send-btn .send-label { white-space: nowrap; }
+
+/* ============================================================
+   CHAT FLOTANTE: burbuja arrastrable + ventana tipo "chat de soporte"
+   (aparece al salir de la pestaña Chat)
+   ============================================================ */
+.ufocs-float-bubble {
+    position: fixed; z-index: 9998;
+    width: 64px; height: 64px; border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, var(--green-bright), var(--green-dark) 70%);
+    border: 2px solid var(--green);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.5), 0 0 0 0 rgba(52,214,122,0.45);
+    display: none; align-items: center; justify-content: center;
+    cursor: grab; touch-action: none; user-select: none;
+    animation: ufocsBubblePulse 2.6s ease-in-out infinite;
+    transition: transform 0.18s ease;
+}
+.ufocs-float-bubble.visible { display: flex; animation: ufocsBubbleIn 0.35s cubic-bezier(0.22,1.4,0.36,1), ufocsBubblePulse 2.6s ease-in-out 0.35s infinite; }
+.ufocs-float-bubble:hover { transform: scale(1.07); }
+.ufocs-float-bubble.dragging { cursor: grabbing; transform: scale(1.12); animation: none; }
+.ufocs-float-bubble img { width: 72%; height: 72%; object-fit: contain; pointer-events: none; border-radius: 50%; }
+.ufocs-float-bubble .ufocs-float-fallback { font-size: 28px; pointer-events: none; }
+.ufocs-float-badge {
+    position: absolute; top: -3px; right: -3px; min-width: 20px; height: 20px; padding: 0 5px;
+    border-radius: 999px; background: var(--danger); color: #fff; font-size: 11px; font-weight: 700;
+    display: none; align-items: center; justify-content: center; border: 2px solid var(--panel-bg);
+}
+.ufocs-float-badge.show { display: flex; }
+.ufocs-float-bubble.thinking::after {
+    content: ''; position: absolute; inset: -6px; border-radius: 50%;
+    border: 2px solid transparent; border-top-color: var(--green-bright);
+    animation: cnSpin 0.9s linear infinite;
+}
+@keyframes ufocsBubbleIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes ufocsBubblePulse {
+    0%, 100% { box-shadow: 0 10px 28px rgba(0,0,0,0.5), 0 0 0 0 rgba(52,214,122,0.4); }
+    50% { box-shadow: 0 10px 28px rgba(0,0,0,0.5), 0 0 0 10px rgba(52,214,122,0); }
+}
+
+.ufocs-float-panel {
+    position: fixed; z-index: 9997;
+    width: min(390px, calc(100vw - 24px));
+    height: min(580px, calc(100vh - 110px));
+    display: none; flex-direction: column;
+    background: var(--panel-bg); color: var(--text-main);
+    border: 1px solid var(--green); border-radius: 18px; overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+    transform-origin: bottom right;
+}
+.ufocs-float-panel.open { display: flex; animation: ufocsPanelIn 0.28s cubic-bezier(0.22,1,0.36,1); }
+.ufocs-float-panel.closing { display: flex; animation: ufocsPanelOut 0.2s ease forwards; }
+@keyframes ufocsPanelIn { from { opacity: 0; transform: scale(0.6) translateY(20px); } to { opacity: 1; transform: none; } }
+@keyframes ufocsPanelOut { from { opacity: 1; transform: none; } to { opacity: 0; transform: scale(0.6) translateY(20px); } }
+.ufocs-float-header {
+    display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+    background: linear-gradient(135deg, var(--green-dark), rgba(0,0,0,0.25));
+    border-bottom: 1px solid var(--input-border);
+    cursor: move; user-select: none; touch-action: none; flex-shrink: 0;
+}
+.ufocs-float-header img { width: 34px; height: 34px; border-radius: 50%; background: rgba(0,0,0,0.25); object-fit: contain; }
+.ufocs-float-title { flex: 1; min-width: 0; }
+.ufocs-float-title b { display: block; font-family: var(--font-display); font-size: 14px; }
+.ufocs-float-title span { font-size: 11.5px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
+.ufocs-float-title span::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--green-bright); }
+.ufocs-float-title span.offline::before { background: var(--text-faint); }
+.ufocs-float-header button {
+    background: transparent; border: 1px solid transparent; color: var(--text-main);
+    width: 30px; height: 30px; border-radius: 8px; cursor: pointer; font-size: 15px;
+    display: flex; align-items: center; justify-content: center;
+}
+.ufocs-float-header button:hover { border-color: var(--green); background: rgba(0,0,0,0.2); }
+.ufocs-float-body { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.ufocs-float-body .chat-messages-wrap { flex: 1; min-height: 0; }
+.ufocs-float-body .chat-hero { transform: scale(0.72); }
+.ufocs-float-body .chat-bubble { max-width: 88%; font-size: 13.5px; }
+.ufocs-float-body .chat-input-bar { padding: 10px; gap: 6px; }
+.ufocs-float-body .chat-input-bar .chat-avatar { display: none; }
+.ufocs-float-body .chat-input-bar .send-label { display: none; }
+.ufocs-float-body .chat-input-bar input[type="text"] { min-width: 0; }
+.ufocs-float-body .attach-menu { bottom: calc(100% + 6px); top: auto; }
+@media (max-width: 520px) {
+    .ufocs-float-panel { width: calc(100vw - 16px); height: calc(100vh - 100px); }
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
@@ -1681,6 +2107,10 @@ body.chat-active #binaryPlanetCanvas { display: block; opacity: 0.16; }
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path><path d="M18 14h-8"></path><path d="M15 18h-5"></path><path d="M10 6h8v4h-8V6Z"></path></svg>
                 CyberNews
             </button>
+            <button class="chat-tab" type="button" data-chattab="smartnote">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"></path><path d="M9 7h7"></path><path d="M9 11h7"></path></svg>
+                Smart Note
+            </button>
         </div>
 
         <!-- PANEL: HISTORIAL DE CHATS (nuevo chat / cambiar / borrar) -->
@@ -1839,7 +2269,10 @@ body.chat-active #binaryPlanetCanvas { display: block; opacity: 0.16; }
         <div class="cybernews-body" id="cyberNewsBody">
             <div class="cn-stage-col" id="cnStageCol">
                 <div class="cn-toolbar">
-                    <h3>CyberNews</h3>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <h3>CyberNews</h3>
+                        <span class="cn-offline-note">📴 Sin internet · solo biografía</span>
+                    </div>
                     <button type="button" id="cnRefreshBtn" title="Actualizar noticias">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
                     </button>
@@ -1851,6 +2284,7 @@ body.chat-active #binaryPlanetCanvas { display: block; opacity: 0.16; }
                     </div>
                     <button type="button" class="cn-nav cn-nav-next" id="cnNextBtn" aria-label="Siguiente">›</button>
                 </div>
+                <div class="cn-autoplay-bar" id="cnAutoplayBar"><span></span></div>
                 <div class="cn-dots" id="cnDots"></div>
             </div>
             <div class="cn-detail-col" id="cnDetailCol">
@@ -1861,6 +2295,168 @@ body.chat-active #binaryPlanetCanvas { display: block; opacity: 0.16; }
                 <div class="cn-detail-date" id="cnDetailDate"></div>
                 <p id="cnDetailSummary"></p>
                 <a id="cnDetailLink" class="cn-detail-link" href="#" target="_blank" rel="noopener">Leer artículo completo ↗</a>
+            </div>
+        </div>
+
+        <!-- VISTA: SMART NOTE (estilo OneNote, notas propias de cada usuario) -->
+        <div class="smartnote-body" id="smartNoteBody">
+            <div class="sn-pages-col">
+                <div class="sn-pages-header">
+                    <h3>Smart Note</h3>
+                    <button type="button" id="snNewPageBtn" title="Nueva página">+ Página</button>
+                </div>
+                <div class="sn-search-box">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="snSearchInput" placeholder="Buscar en Smart Note...">
+                </div>
+                <div class="sn-search-results" id="snSearchResults"></div>
+                <div class="sn-pages-tree" id="snPagesTree"></div>
+            </div>
+            <div class="sn-editor-col">
+                <div class="sn-editor-empty" id="snEditorEmpty">Selecciona una página de la izquierda o crea una nueva para empezar a escribir.</div>
+                <div class="sn-editor-wrap" id="snEditorWrap" style="display:none;">
+                    <div class="sn-editor-toolbar">
+                        <input type="text" id="snPageTitle" class="sn-page-title-input" placeholder="Título de la página" maxlength="200">
+                        <div class="sn-toolbar-actions">
+                            <button type="button" id="snImageBtn" title="Insertar imagen">🖼️</button>
+                            <button type="button" id="snTextBoxBtn" title="Insertar cuadro de texto libre">🔤</button>
+                            <button type="button" id="snLinkBtn" title="Insertar enlace">🔗</button>
+                            <span class="sn-toolbar-sep"></span>
+                            <div class="sn-dropdown-wrap">
+                                <button type="button" id="snDrawToggleBtn" title="Herramientas de dibujo">✏️</button>
+                                <div class="sn-dropdown-panel" id="snDrawPanel">
+                                    <div class="sn-dd-title">Herramientas de dibujo</div>
+                                    <div class="sn-draw-tools-row">
+                                        <button type="button" class="sn-draw-tool active" id="snToolPen" data-tool="pen" title="Lápiz">✒️</button>
+                                        <button type="button" class="sn-draw-tool" id="snToolMarker" data-tool="marker" title="Marcador">🖍️</button>
+                                        <button type="button" class="sn-draw-tool" id="snToolPluma" data-tool="pluma" title="Pluma">🖋️</button>
+                                        <button type="button" class="sn-draw-tool" id="snToolEraser" data-tool="eraser" title="Borrador">🧽</button>
+                                    </div>
+                                    <div class="sn-draw-row">
+                                        <label>Color</label>
+                                        <input type="color" id="snDrawColor" value="#34d67a">
+                                    </div>
+                                    <div class="sn-draw-row">
+                                        <label>Grosor</label>
+                                        <input type="range" id="snDrawWidth" min="1" max="30" value="3">
+                                    </div>
+                                    <div class="sn-draw-row">
+                                        <label>Opacidad</label>
+                                        <input type="range" id="snDrawOpacity" min="5" max="100" value="35">
+                                    </div>
+                                    <div class="sn-dd-title">Formas</div>
+                                    <div class="sn-draw-tools-row">
+                                        <button type="button" class="sn-shape-btn" data-shape="circle" title="Círculo">⚪</button>
+                                        <button type="button" class="sn-shape-btn" data-shape="square" title="Cuadrado">◻️</button>
+                                        <button type="button" class="sn-shape-btn" data-shape="arrow" title="Flecha">➡️</button>
+                                        <button type="button" class="sn-shape-btn" data-shape="star" title="Estrella">⭐</button>
+                                    </div>
+                                    <div class="sn-draw-actions">
+                                        <button type="button" id="snDrawSave">Guardar en la nota</button>
+                                        <button type="button" id="snDrawClear">Borrar todo</button>
+                                        <button type="button" id="snDrawCancel">Cerrar</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="sn-toolbar-sep"></span>
+                            <div class="sn-dropdown-wrap">
+                                <button type="button" id="snDownloadToggleBtn" class="sn-save-doc-btn" title="Guardar / descargar este documento">💾 Guardar documento</button>
+                                <div class="sn-dropdown-panel sn-dropdown-panel-sm" id="snDownloadPanel">
+                                    <button type="button" id="snDownloadTxtBtn">📄 Descargar como TXT</button>
+                                    <button type="button" id="snDownloadWordBtn">📝 Descargar como Word</button>
+                                    <button type="button" id="snDownloadPdfBtn">🧾 Descargar como PDF</button>
+                                </div>
+                            </div>
+                            <div class="sn-dropdown-wrap">
+                                <button type="button" id="snSettingsToggleBtn" title="Apariencia de Smart Note">⚙️</button>
+                                <div class="sn-dropdown-panel sn-dropdown-panel-sm" id="snSettingsPanel">
+                                    <div class="sn-dd-title">Fondo de la página</div>
+                                    <div class="sn-bg-swatches">
+                                        <button type="button" class="sn-bg-swatch sn-bg-dark" data-bgtheme="dark" title="Oscuro (default)"></button>
+                                        <button type="button" class="sn-bg-swatch sn-bg-light" data-bgtheme="light" title="Blanco"></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="sn-toolbar-sep"></span>
+                            <button type="button" id="snSubpageBtn" title="Nueva subpágina">↳ Sub</button>
+                            <button type="button" id="snDeleteBtn" title="Eliminar página">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="sn-format-toolbar" id="snFormatToolbar">
+                        <select id="snFormatBlock" title="Estilo de párrafo">
+                            <option value="p">Párrafo</option>
+                            <option value="h1">Título 1</option>
+                            <option value="h2">Título 2</option>
+                            <option value="h3">Título 3</option>
+                            <option value="blockquote">Cita</option>
+                        </select>
+                        <select id="snFontFamily" title="Tipo de letra">
+                            <option value="Inter, sans-serif">Inter</option>
+                            <option value="Arial, sans-serif">Arial</option>
+                            <option value="Georgia, serif">Georgia</option>
+                            <option value="'Times New Roman', serif">Times New Roman</option>
+                            <option value="'Courier New', monospace">Courier New</option>
+                            <option value="Verdana, sans-serif">Verdana</option>
+                            <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                            <option value="'Comic Sans MS', cursive">Comic Sans MS</option>
+                        </select>
+                        <select id="snFontSize" title="Tamaño de letra">
+                            <option value="12">12</option>
+                            <option value="14" selected>14</option>
+                            <option value="16">16</option>
+                            <option value="18">18</option>
+                            <option value="20">20</option>
+                            <option value="24">24</option>
+                            <option value="28">28</option>
+                            <option value="32">32</option>
+                            <option value="40">40</option>
+                        </select>
+                        <span class="sn-toolbar-sep"></span>
+                        <button type="button" id="snBoldBtn" title="Negrita"><b>B</b></button>
+                        <button type="button" id="snItalicBtn" title="Cursiva"><i>I</i></button>
+                        <button type="button" id="snUnderlineBtn" title="Subrayado"><u>U</u></button>
+                        <button type="button" id="snStrikeBtn" title="Tachado"><s>S</s></button>
+                        <input type="color" id="snTextColor" title="Color de texto" value="#eef1ef">
+                        <span class="sn-toolbar-sep"></span>
+                        <div class="sn-highlight-swatches" title="Resaltar texto seleccionado">
+                            <button type="button" class="sn-highlight-swatch" data-hicolor="#fff59d" style="background:#fff59d" title="Amarillo"></button>
+                            <button type="button" class="sn-highlight-swatch" data-hicolor="#a5f3a0" style="background:#a5f3a0" title="Verde"></button>
+                            <button type="button" class="sn-highlight-swatch" data-hicolor="#ffb3c6" style="background:#ffb3c6" title="Rosa"></button>
+                            <button type="button" class="sn-highlight-swatch" data-hicolor="#90caf9" style="background:#90caf9" title="Azul"></button>
+                            <button type="button" class="sn-highlight-swatch" data-hicolor="#ffcc80" style="background:#ffcc80" title="Naranja"></button>
+                            <button type="button" class="sn-highlight-swatch sn-highlight-none" data-hicolor="transparent" title="Quitar resaltado">✕</button>
+                        </div>
+                        <span class="sn-toolbar-sep"></span>
+                        <button type="button" id="snAlignLeftBtn" title="Alinear izquierda">⯇☰</button>
+                        <button type="button" id="snAlignCenterBtn" title="Centrar">☰</button>
+                        <button type="button" id="snAlignRightBtn" title="Alinear derecha">☰⯈</button>
+                        <button type="button" id="snAlignJustifyBtn" title="Justificar">☷</button>
+                        <span class="sn-toolbar-sep"></span>
+                        <button type="button" id="snBulletListBtn" title="Lista con viñetas">•≡</button>
+                        <button type="button" id="snNumberListBtn" title="Lista numerada">1≡</button>
+                        <button type="button" id="snIndentBtn" title="Aumentar sangría">⇥</button>
+                        <button type="button" id="snOutdentBtn" title="Disminuir sangría">⇤</button>
+                        <span class="sn-toolbar-sep"></span>
+                        <button type="button" id="snUndoBtn" title="Deshacer">↺</button>
+                        <button type="button" id="snRedoBtn" title="Rehacer">↻</button>
+                    </div>
+                    <input type="file" id="snImageInput" accept="image/*" style="display:none;">
+                    <div class="sn-editor-content-wrap" id="snEditorContentWrap">
+                        <div class="sn-editor-content" id="snEditorContent" contenteditable="true" spellcheck="false" placeholder="Escribe aquí..."></div>
+                        <canvas id="snDrawCanvas"></canvas>
+                    </div>
+                    <div class="sn-image-toolbar" id="snImageToolbar">
+                        <label>Ancho</label>
+                        <input type="range" id="snImgWidth" min="30" max="900" value="240">
+                        <label>Alto</label>
+                        <input type="range" id="snImgHeight" min="30" max="900" value="180">
+                        <label>Opacidad</label>
+                        <input type="range" id="snImgOpacity" min="10" max="100" value="100">
+                        <button type="button" id="snImgLayerBtn">Enviar atrás</button>
+                        <button type="button" id="snImgDeleteBtn" title="Eliminar imagen">🗑️</button>
+                    </div>
+                    <div class="sn-save-status" id="snSaveStatus">&nbsp;</div>
+                </div>
             </div>
         </div>
     </div>
@@ -2035,7 +2631,14 @@ function usernameValid(username) {
 // ============================================================
 function setSession(username) { sessionStorage.setItem(SESSION_KEY, username); }
 function getSession() { return sessionStorage.getItem(SESSION_KEY); }
-function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
+function clearSession() {
+    // Al cerrar sesión, el modo libre se apaga: la próxima vez que alguien
+    // entre (incluso si es el mismo usuario) vuelve a ser el agente de
+    // ciberseguridad por default, hasta que alguien la desbloquee de nuevo.
+    const username = getSession();
+    if (username) sessionStorage.removeItem('ufocs_unlocked_' + username);
+    sessionStorage.removeItem(SESSION_KEY);
+}
 
 function initDashboard() {
     document.getElementById('chatLogoutBtn').addEventListener('click', () => {
@@ -2434,6 +3037,10 @@ function initChat() {
     initStopButton();
     initChatHistoryPanel();
     initSettingsPanel();
+    initSmartNote();
+    initChatScrollTracking();
+    initConnectivityWatch();
+    initFloatingChat();
 }
 
 // ============================================================
@@ -2638,6 +3245,1182 @@ function closeSettingsPanel() {
     document.getElementById('settingsOverlay').classList.remove('active');
 }
 
+// ============================================================
+// SMART NOTE — notas estilo OneNote (texto, imágenes con escala/
+// opacidad/orden, links clicables, subpáginas plegables, búsqueda,
+// temas de fondo, descarga en TXT/Word/PDF y herramientas de dibujo).
+// Cada usuario tiene su propio cuaderno, aislado del resto igual
+// que sus alertas y su historial de chat.
+// ============================================================
+let snPages = [];            // árbol plano: [{id, title, parentId, content, collapsed, updated_at}, ...]
+let snActivePageId = null;
+let snSaveTimer = null;
+let snSelectedImage = null;
+let snLastRange = null;
+
+// Antes de aplicar cualquier formato (negrita, color, marca texto, fuente,
+// tamaño, alineación...), vuelve a poner el cursor/selección donde estaba.
+// - Si hay texto seleccionado dentro de un cuadro de texto → se aplica ahí.
+// - Si el cuadro de texto está seleccionado pero no hay texto marcado →
+//   se aplica a TODO el contenido del cuadro.
+// - Si no, se aplica en la hoja normal como antes.
+function snRestoreEditingSelection() {
+    const editorContent = document.getElementById('snEditorContent');
+    const sel = window.getSelection();
+    const frame = snSelectedImage && snSelectedImage.classList.contains('sn-text-frame') ? snSelectedImage : null;
+    const frameInner = frame ? frame.querySelector('.sn-text-frame-inner') : null;
+
+    let range = snLastRange;
+    const rangeInFrame = range && frameInner && frameInner.contains(range.commonAncestorContainer);
+
+    if (frameInner && (!rangeInFrame || range.collapsed)) {
+        range = document.createRange();
+        range.selectNodeContents(frameInner);
+    }
+    if (!range || !editorContent.contains(range.commonAncestorContainer)) {
+        editorContent.focus();
+        return;
+    }
+    const startEl = range.startContainer.nodeType === 1 ? range.startContainer : range.startContainer.parentElement;
+    const host = (startEl && startEl.closest('.sn-text-frame-inner')) || editorContent;
+    host.focus({ preventScroll: true });
+    sel.removeAllRanges();
+    sel.addRange(range);
+}
+let snDrawTool = 'pen';
+let snDrawing = false;
+let snDrawCtx = null;
+
+function snUid() {
+    return 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+}
+
+function snEscapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+}
+
+function snStripHtmlToText(htmlStr) {
+    const div = document.createElement('div');
+    div.innerHTML = htmlStr || '';
+    return (div.textContent || div.innerText || '').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+function snDownloadBlob(content, filename, mime) {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+function snIsLikelyUrl(text) {
+    return /^https?:\/\/[^\s]+$/i.test(text || '');
+}
+
+async function loadSmartNotes() {
+    const username = getSession();
+    if (!username) return;
+    try {
+        const res = await fetch('/api/notes/' + encodeURIComponent(username));
+        const data = await res.json();
+        snPages = Array.isArray(data.pages) ? data.pages : [];
+    } catch (err) {
+        snPages = [];
+    }
+    if (!snActivePageId && snPages.length) snActivePageId = snPages[0].id;
+    renderSnPagesTree();
+    if (snActivePageId) {
+        openSnPage(snActivePageId);
+    } else {
+        document.getElementById('snEditorEmpty').style.display = 'flex';
+        document.getElementById('snEditorWrap').style.display = 'none';
+    }
+    snApplySavedTheme();
+}
+
+// --------- Árbol de páginas, plegable como OneNote ---------
+function snPageHasChildren(pageId) {
+    return snPages.some(p => (p.parentId || null) === pageId);
+}
+
+function snExpandAncestors(pageId) {
+    let page = snPages.find(p => p.id === pageId);
+    while (page && page.parentId) {
+        const parent = snPages.find(p => p.id === page.parentId);
+        if (parent) parent.collapsed = false;
+        page = parent;
+    }
+}
+
+function renderSnPagesTree() {
+    const tree = document.getElementById('snPagesTree');
+    tree.innerHTML = '';
+
+    function renderLevel(parentId, depth) {
+        snPages.filter(p => (p.parentId || null) === parentId).forEach(page => {
+            const item = document.createElement('div');
+            item.className = 'sn-page-item' + (page.id === snActivePageId ? ' active' : '');
+            item.style.paddingLeft = (8 + depth * 16) + 'px';
+
+            const hasChildren = snPageHasChildren(page.id);
+            if (hasChildren) {
+                const toggle = document.createElement('span');
+                toggle.className = 'sn-page-toggle' + (!page.collapsed ? ' expanded' : '');
+                toggle.innerHTML = '▸';
+                toggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    page.collapsed = !page.collapsed;
+                    renderSnPagesTree();
+                });
+                item.appendChild(toggle);
+            } else {
+                const placeholder = document.createElement('span');
+                placeholder.className = 'sn-page-toggle-placeholder';
+                item.appendChild(placeholder);
+            }
+
+            const icon = document.createElement('span');
+            icon.className = 'sn-page-icon';
+            icon.textContent = depth > 0 ? '↳' : '📄';
+            item.appendChild(icon);
+
+            const titleEl = document.createElement('span');
+            titleEl.className = 'sn-page-title';
+            titleEl.textContent = page.title || 'Sin título';
+            item.appendChild(titleEl);
+
+            item.addEventListener('click', () => openSnPage(page.id));
+            tree.appendChild(item);
+
+            if (!page.collapsed) renderLevel(page.id, depth + 1);
+        });
+    }
+    renderLevel(null, 0);
+
+    if (!snPages.length) {
+        const empty = document.createElement('div');
+        empty.style.cssText = 'padding:14px 8px; font-size:12px; color:var(--text-faint, #8a8d93);';
+        empty.textContent = 'Aún no tienes páginas. Crea la primera con "+ Página".';
+        tree.appendChild(empty);
+    }
+}
+
+function openSnPage(pageId) {
+    const page = snPages.find(p => p.id === pageId);
+    if (!page) return;
+    snActivePageId = pageId;
+    snExpandAncestors(pageId);
+    snDeselectImage();
+    document.getElementById('snEditorEmpty').style.display = 'none';
+    document.getElementById('snEditorWrap').style.display = 'flex';
+    document.getElementById('snPageTitle').value = page.title || '';
+    document.getElementById('snEditorContent').innerHTML = page.content || '';
+    snUpgradeLegacyImages();
+    snRewireSavedFrames();
+    renderSnPagesTree();
+}
+
+function snScheduleSave() {
+    const statusEl = document.getElementById('snSaveStatus');
+    if (statusEl) statusEl.textContent = 'Guardando...';
+    clearTimeout(snSaveTimer);
+    snSaveTimer = setTimeout(saveSmartNotes, 700);
+}
+
+async function saveSmartNotes() {
+    const username = getSession();
+    if (!username) return;
+    const statusEl = document.getElementById('snSaveStatus');
+    try {
+        await fetch('/api/notes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, pages: snPages })
+        });
+        if (statusEl) {
+            statusEl.textContent = 'Guardado ✓';
+            setTimeout(() => { if (statusEl.textContent === 'Guardado ✓') statusEl.textContent = ''; }, 1500);
+        }
+    } catch (err) {
+        if (statusEl) statusEl.textContent = 'No se pudo guardar (revisa el servidor)';
+    }
+}
+
+function snUpdateActivePage(fields) {
+    const page = snPages.find(p => p.id === snActivePageId);
+    if (!page) return;
+    Object.assign(page, fields, { updated_at: Date.now() });
+    snScheduleSave();
+}
+
+function snSyncContentFromEditor() {
+    // La barra "Arrastra para mover" de los cuadros de texto es solo de
+    // interfaz: no se guarda en la nota (se vuelve a poner al abrirla).
+    const html = document.getElementById('snEditorContent').innerHTML
+        .replace(/<div class="sn-text-frame-bar"[^>]*>[\s\S]*?<\/div>/g, '');
+    snUpdateActivePage({ content: html });
+}
+
+// --------- Buscador de palabras clave dentro de Smart Note ---------
+function snRunSearch(term) {
+    const resultsEl = document.getElementById('snSearchResults');
+    term = (term || '').trim().toLowerCase();
+    if (!term) {
+        resultsEl.classList.remove('active');
+        resultsEl.innerHTML = '';
+        return;
+    }
+    const matches = snPages.filter(p => {
+        const title = (p.title || '').toLowerCase();
+        const text = snStripHtmlToText(p.content || '').toLowerCase();
+        return title.includes(term) || text.includes(term);
+    });
+    resultsEl.innerHTML = '';
+    resultsEl.classList.add('active');
+    if (!matches.length) {
+        const empty = document.createElement('div');
+        empty.className = 'sn-search-empty';
+        empty.textContent = 'Sin resultados para "' + term + '".';
+        resultsEl.appendChild(empty);
+        return;
+    }
+    matches.forEach(page => {
+        const plain = snStripHtmlToText(page.content || '');
+        const idx = plain.toLowerCase().indexOf(term);
+        const snippet = idx >= 0 ? plain.slice(Math.max(0, idx - 30), idx + 60) : plain.slice(0, 60);
+        const item = document.createElement('div');
+        item.className = 'sn-search-result-item';
+        item.innerHTML = '<span class="sn-sr-title"></span><span class="sn-sr-snippet"></span>';
+        item.querySelector('.sn-sr-title').textContent = page.title || 'Sin título';
+        item.querySelector('.sn-sr-snippet').textContent = snippet ? ('…' + snippet + '…') : '(página sin texto)';
+        item.addEventListener('click', () => {
+            openSnPage(page.id);
+            resultsEl.classList.remove('active');
+            document.getElementById('snSearchInput').value = '';
+            setTimeout(() => { try { window.find && window.find(term); } catch (e) { /* noop */ } }, 60);
+        });
+        resultsEl.appendChild(item);
+    });
+}
+
+// --------- Tema de fondo de la página (oscuro por defecto, o blanco) ---------
+function snThemeKey() { return 'ufocs_sn_theme_' + (getSession() || 'anon'); }
+
+function snApplySavedTheme() {
+    let saved = localStorage.getItem(snThemeKey()) || 'dark';
+    if (saved !== 'dark' && saved !== 'light') saved = 'dark'; // ya no existe "sepia"
+    snSetTheme(saved);
+}
+
+function snSetTheme(theme) {
+    const content = document.getElementById('snEditorContent');
+    content.classList.remove('sn-theme-light');
+    if (theme === 'light') content.classList.add('sn-theme-light');
+    localStorage.setItem(snThemeKey(), theme);
+    document.querySelectorAll('.sn-bg-swatch').forEach(sw => {
+        sw.classList.toggle('active', sw.getAttribute('data-bgtheme') === theme);
+    });
+}
+
+// --------- Enlaces automáticos: si pegas o escribes una URL suelta,
+// se convierte sola en link clicable ---------
+function snLinkifyEditorContent() {
+    const root = document.getElementById('snEditorContent');
+    const urlRegex = /(https?:\/\/[^\s<]+[^\s<.,:;"')\]])/g;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    const textNodes = [];
+    let node;
+    while ((node = walker.nextNode())) {
+        if (node.parentElement && node.parentElement.closest('a')) continue;
+        urlRegex.lastIndex = 0;
+        if (urlRegex.test(node.nodeValue)) textNodes.push(node);
+    }
+    textNodes.forEach(tn => {
+        const frag = document.createDocumentFragment();
+        let lastIndex = 0, m;
+        urlRegex.lastIndex = 0;
+        while ((m = urlRegex.exec(tn.nodeValue))) {
+            frag.appendChild(document.createTextNode(tn.nodeValue.slice(lastIndex, m.index)));
+            const a = document.createElement('a');
+            a.href = m[0];
+            a.target = '_blank';
+            a.rel = 'noopener';
+            a.textContent = m[0];
+            frag.appendChild(a);
+            lastIndex = m.index + m[0].length;
+        }
+        frag.appendChild(document.createTextNode(tn.nodeValue.slice(lastIndex)));
+        if (tn.parentNode) tn.parentNode.replaceChild(frag, tn);
+    });
+}
+
+// --------- Insertar imágenes (botón, arrastrar, o pegar) ---------
+// --------- Imágenes / formas / dibujos / cuadros de texto "libres":
+// se insertan dentro de un "frame" que se puede arrastrar a cualquier
+// parte de la hoja y redimensionar libremente (ancho y alto por
+// separado). Cada frame trae además una "agarradera" (el puntito ⠿ en
+// la esquina) que SIEMPRE queda clicable, incluso si el frame está
+// enviado detrás del texto y ya no se puede tocar directamente. ---------
+const snWiredFrames = new WeakSet();
+
+function snMakeTextFrameBar() {
+    const bar = document.createElement('div');
+    bar.className = 'sn-text-frame-bar';
+    bar.contentEditable = 'false';
+    bar.innerHTML = '<b>⠿</b><span>Arrastra para mover</span><span class="sn-tf-del" title="Eliminar cuadro de texto">✕</span>';
+    return bar;
+}
+
+// Engancha los eventos del contenido editable de un cuadro de texto
+function snWireTextFrameInner(frame) {
+    const inner = frame.querySelector('.sn-text-frame-inner');
+    if (!inner) return;
+    inner.contentEditable = 'true';
+    inner.addEventListener('input', () => snSyncContentFromEditor());
+    inner.addEventListener('mousedown', (e) => e.stopPropagation());
+    inner.addEventListener('click', (e) => { e.stopPropagation(); snSelectImage(frame); });
+    inner.addEventListener('focus', () => snSelectImage(frame));
+}
+
+function snWireImageFrame(frame) {
+    if (snWiredFrames.has(frame)) return;
+    snWiredFrames.add(frame);
+    const handle = frame.querySelector('.sn-img-resize-handle');
+    const grab = frame.querySelector('.sn-img-grab-handle');
+    const isTextFrame = frame.classList.contains('sn-text-frame');
+    const bar = frame.querySelector('.sn-text-frame-bar');
+
+    // Arrastre con pointer events (mouse, touch y pluma)
+    function startPointerDrag(e) {
+        if (e.button !== undefined && e.button !== 0) return;
+        if (e.target.closest && e.target.closest('.sn-tf-del')) return;
+        e.preventDefault();
+        e.stopPropagation();
+        snSelectImage(frame);
+        const startX = e.clientX, startY = e.clientY;
+        const startLeft = parseFloat(frame.style.left) || 0;
+        const startTop = parseFloat(frame.style.top) || 0;
+        let moved = false;
+        frame.classList.add('sn-tf-dragging');
+        function onMove(ev) {
+            const dx = ev.clientX - startX, dy = ev.clientY - startY;
+            if (Math.abs(dx) > 2 || Math.abs(dy) > 2) moved = true;
+            frame.style.left = Math.max(0, startLeft + dx) + 'px';
+            frame.style.top = Math.max(24, startTop + dy) + 'px';
+        }
+        function onUp() {
+            document.removeEventListener('pointermove', onMove);
+            document.removeEventListener('pointerup', onUp);
+            document.removeEventListener('pointercancel', onUp);
+            frame.classList.remove('sn-tf-dragging');
+            if (moved) snSyncContentFromEditor();
+        }
+        document.addEventListener('pointermove', onMove);
+        document.addEventListener('pointerup', onUp);
+        document.addEventListener('pointercancel', onUp);
+    }
+
+    if (bar) {
+        bar.addEventListener('pointerdown', startPointerDrag);
+        const del = bar.querySelector('.sn-tf-del');
+        if (del) del.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (snSelectedImage === frame) snDeselectImage();
+            frame.remove();
+            snSyncContentFromEditor();
+        });
+    }
+    if (isTextFrame) snWireTextFrameInner(frame);
+
+    function startDrag(e) {
+        e.preventDefault();
+        snSelectImage(frame);
+        const startX = e.clientX, startY = e.clientY;
+        const startLeft = parseFloat(frame.style.left) || 0;
+        const startTop = parseFloat(frame.style.top) || 0;
+        let moved = false;
+        function onMove(ev) {
+            const dx = ev.clientX - startX, dy = ev.clientY - startY;
+            if (Math.abs(dx) > 2 || Math.abs(dy) > 2) moved = true;
+            frame.style.left = (startLeft + dx) + 'px';
+            frame.style.top = (startTop + dy) + 'px';
+        }
+        function onUp() {
+            document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('mouseup', onUp);
+            if (moved) snSyncContentFromEditor();
+        }
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+    }
+
+    // Las imágenes se arrastran tocando la imagen misma. Los cuadros de
+    // texto NO (ahí un click debe poner el cursor a escribir); esos solo
+    // se arrastran desde su agarradera ⠿.
+    if (!isTextFrame) {
+        frame.addEventListener('mousedown', (e) => {
+            if (e.target === handle || e.target === grab) return;
+            startDrag(e);
+        });
+    } else {
+        frame.addEventListener('mousedown', (e) => {
+            if (e.target === handle || e.target === grab) return;
+            snSelectImage(frame);
+        });
+    }
+
+    // La agarradera siempre está por encima de todo (ver CSS), así que
+    // siempre se puede usar para seleccionar y mover el frame, incluso
+    // cuando está "enviado atrás" y el resto ya no responde al click.
+    if (grab) grab.addEventListener('mousedown', startDrag);
+
+    handle.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        snSelectImage(frame);
+        const startX = e.clientX, startY = e.clientY;
+        const startW = frame.offsetWidth, startH = frame.offsetHeight;
+        function onMove(ev) {
+            const dx = ev.clientX - startX, dy = ev.clientY - startY;
+            frame.style.width = Math.max(30, startW + dx) + 'px';
+            frame.style.height = Math.max(30, startH + dy) + 'px';
+        }
+        function onUp() {
+            document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('mouseup', onUp);
+            snSyncContentFromEditor();
+            if (snSelectedImage === frame) snRefreshImageToolbarValues();
+        }
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+    });
+}
+
+function snMakeGrabHandle() {
+    const grab = document.createElement('span');
+    grab.className = 'sn-img-grab-handle';
+    grab.contentEditable = 'false';
+    grab.textContent = '⠿';
+    grab.title = 'Mover / seleccionar';
+    return grab;
+}
+
+function snMakeResizeHandle() {
+    const handle = document.createElement('span');
+    handle.className = 'sn-img-resize-handle';
+    handle.contentEditable = 'false';
+    return handle;
+}
+
+// Convierte a "frame libre" cualquier <img> que ya venga guardada en el
+// HTML de la nota (de antes de este cambio) para que también se pueda
+// mover/redimensionar/reordenar como las nuevas.
+function snUpgradeLegacyImages() {
+    const content = document.getElementById('snEditorContent');
+    content.querySelectorAll('img').forEach(img => {
+        if (img.closest('.sn-img-frame')) return;
+        const frame = document.createElement('span');
+        frame.className = 'sn-img-frame';
+        frame.contentEditable = 'false';
+        const w = img.offsetWidth || 240;
+        const h = img.offsetHeight || 180;
+        frame.style.cssText = 'position:absolute; left:' + (img.offsetLeft || 20) + 'px; top:' + (img.offsetTop || 20) + 'px; width:' + w + 'px; height:' + h + 'px; z-index:2; opacity:' + (img.style.opacity || '1') + ';';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.parentNode.insertBefore(frame, img);
+        frame.appendChild(img);
+        frame.appendChild(snMakeResizeHandle());
+        frame.appendChild(snMakeGrabHandle());
+        snWireImageFrame(frame);
+    });
+}
+
+// Al abrir una nota guardada, las imágenes y cuadros de texto vienen como
+// HTML "muerto" (sin eventos). Aquí se les vuelve a dar vida para que se
+// puedan seguir moviendo, redimensionando y editando.
+function snRewireSavedFrames() {
+    const content = document.getElementById('snEditorContent');
+    content.querySelectorAll('.sn-img-frame, .sn-text-frame').forEach(frame => {
+        frame.classList.remove('sn-img-selected', 'sn-tf-dragging');
+        if (!frame.querySelector('.sn-img-resize-handle')) frame.appendChild(snMakeResizeHandle());
+        if (!frame.querySelector('.sn-img-grab-handle')) frame.appendChild(snMakeGrabHandle());
+        if (frame.classList.contains('sn-text-frame') && !frame.querySelector('.sn-text-frame-bar')) {
+            frame.insertBefore(snMakeTextFrameBar(), frame.querySelector('.sn-img-resize-handle'));
+        }
+        snWireImageFrame(frame);
+    });
+}
+
+function snInsertFreeImage(dataUrl, opts) {
+    const content = document.getElementById('snEditorContent');
+    const frame = document.createElement('span');
+    frame.className = 'sn-img-frame';
+    frame.contentEditable = 'false';
+    const left = (opts && opts.left != null) ? opts.left : (content.scrollLeft + 30);
+    const top = (opts && opts.top != null) ? opts.top : (content.scrollTop + 30);
+    const width = (opts && opts.width) || 240;
+    const height = (opts && opts.height) || 180;
+    const zIndex = (opts && opts.zIndex) || 2;
+    const opacity = (opts && opts.opacity != null) ? opts.opacity : 1;
+    frame.style.cssText = 'position:absolute; left:' + left + 'px; top:' + top + 'px; width:' + width + 'px; height:' + height + 'px; z-index:' + zIndex + '; opacity:' + opacity + ';';
+    const img = document.createElement('img');
+    img.src = dataUrl;
+    img.draggable = false;
+    frame.appendChild(img);
+    frame.appendChild(snMakeResizeHandle());
+    frame.appendChild(snMakeGrabHandle());
+    content.appendChild(frame);
+    snWireImageFrame(frame);
+    snSyncContentFromEditor();
+    return frame;
+}
+
+// Cuadro de texto libre, como un "text box" de Word: se puede mover,
+// redimensionar y escribir dentro, sin depender del flujo del párrafo.
+function snInsertFreeTextBox() {
+    const content = document.getElementById('snEditorContent');
+    const frame = document.createElement('div');
+    frame.className = 'sn-text-frame';
+    frame.contentEditable = 'false';
+    frame.style.cssText = 'position:absolute; left:' + (content.scrollLeft + 40) + 'px; top:' + (content.scrollTop + 50) + 'px; width:240px; height:120px; z-index:2; opacity:1;';
+    const inner = document.createElement('div');
+    inner.className = 'sn-text-frame-inner';
+    inner.contentEditable = 'true';
+    frame.appendChild(inner);
+    frame.appendChild(snMakeTextFrameBar());
+    frame.appendChild(snMakeResizeHandle());
+    frame.appendChild(snMakeGrabHandle());
+    content.appendChild(frame);
+    snWireImageFrame(frame);
+    snSyncContentFromEditor();
+    inner.focus();
+    return frame;
+}
+
+function snInsertImageFile(file) {
+    if (!file || file.type.indexOf('image') !== 0) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+            // Mantiene proporción inicial razonable (ancho fijo, alto proporcional)
+            const targetW = Math.min(320, img.naturalWidth || 320);
+            const targetH = img.naturalWidth ? Math.round(targetW * (img.naturalHeight / img.naturalWidth)) : 220;
+            snInsertFreeImage(reader.result, { width: targetW, height: targetH });
+        };
+        img.onerror = () => snInsertFreeImage(reader.result, {});
+        img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+// --------- Herramienta flotante para manipular un frame seleccionado:
+// ancho, alto, opacidad y orden (delante / detrás del texto) ---------
+function snDeselectImage() {
+    if (snSelectedImage) snSelectedImage.classList.remove('sn-img-selected');
+    snSelectedImage = null;
+    document.getElementById('snImageToolbar').classList.remove('active');
+}
+
+function snRefreshImageToolbarValues() {
+    if (!snSelectedImage) return;
+    document.getElementById('snImgWidth').value = Math.round(snSelectedImage.offsetWidth);
+    document.getElementById('snImgHeight').value = Math.round(snSelectedImage.offsetHeight);
+    const currentOpacity = Math.round((parseFloat(snSelectedImage.style.opacity || '1')) * 100);
+    document.getElementById('snImgOpacity').value = currentOpacity || 100;
+    document.getElementById('snImgLayerBtn').textContent = snSelectedImage.classList.contains('sn-img-behind') ? 'Traer al frente' : 'Enviar atrás';
+}
+
+function snSelectImage(frame) {
+    if (snSelectedImage === frame) return;
+    snDeselectImage();
+    snSelectedImage = frame;
+    frame.classList.add('sn-img-selected');
+    document.getElementById('snImageToolbar').classList.add('active');
+    snRefreshImageToolbarValues();
+}
+
+// "Detrás del texto": al usar un z-index negativo, el navegador pinta la
+// imagen por debajo del contenido normal (el texto) de este mismo
+// contenedor, así queda realmente oculta tras las letras. La agarradera
+// ⠿ se queda siempre visible y por encima de todo para poder recuperarla.
+function snToggleImageLayer(frame) {
+    const behind = frame.classList.contains('sn-img-behind');
+    if (!behind) {
+        frame.style.zIndex = '-1';
+        frame.classList.add('sn-img-behind');
+    } else {
+        frame.style.zIndex = '2';
+        frame.classList.remove('sn-img-behind');
+    }
+}
+
+// --------- Herramientas de dibujo: lápiz, marcador, pluma, borrador y formas ---------
+// "alpha" es el valor por defecto al cambiar de herramienta; el usuario
+// puede subirlo/bajarlo a mano con el slider de Opacidad (por eso el
+// marcador empieza bajo: para que no tape la letra que resalta).
+const SN_DRAW_PRESETS = {
+    pen: { alpha: 1, widthMult: 1 },
+    marker: { alpha: 0.35, widthMult: 4 },
+    pluma: { alpha: 0.9, widthMult: 1.4 },
+    eraser: { alpha: 1, widthMult: 3 }
+};
+
+let snDrawLastPoint = null;
+
+function snResizeCanvas() {
+    const canvas = document.getElementById('snDrawCanvas');
+    const wrap = document.getElementById('snEditorContentWrap');
+    canvas.width = wrap.clientWidth;
+    canvas.height = wrap.clientHeight;
+}
+
+function snStartDrawMode() {
+    const canvas = document.getElementById('snDrawCanvas');
+    // Si ya estaba activo no volvemos a redimensionar: cambiar el tamaño
+    // del canvas borra lo que ya se había dibujado, y aquí solo queremos
+    // "asegurarnos" de que esté encendido al elegir una herramienta.
+    if (canvas.classList.contains('active')) return;
+    snResizeCanvas();
+    canvas.classList.add('active');
+    snDrawCtx = canvas.getContext('2d');
+    snDrawCtx.lineCap = 'round';
+    snDrawCtx.lineJoin = 'round';
+}
+
+function snStopDrawMode() {
+    const canvas = document.getElementById('snDrawCanvas');
+    canvas.classList.remove('active');
+}
+
+function snClearDrawCanvas() {
+    const canvas = document.getElementById('snDrawCanvas');
+    if (snDrawCtx) snDrawCtx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function snSaveDrawingToNote() {
+    const canvas = document.getElementById('snDrawCanvas');
+    if (!snDrawCtx) return;
+    // ¿Hay algo dibujado? revisamos si el canvas no está completamente vacío
+    const blank = document.createElement('canvas');
+    blank.width = canvas.width; blank.height = canvas.height;
+    if (canvas.toDataURL() === blank.toDataURL()) {
+        snStopDrawMode();
+        return;
+    }
+    const dataUrl = canvas.toDataURL('image/png');
+    const content = document.getElementById('snEditorContent');
+    // El dibujo se coloca EXACTAMENTE donde estaba el lienzo (misma posición
+    // y tamaño que se ve en pantalla), para que el resaltado quede pegado
+    // a la letra que se subrayó, tanto en la nota como al descargarla.
+    snInsertFreeImage(dataUrl, {
+        left: content.scrollLeft,
+        top: content.scrollTop,
+        width: canvas.width,
+        height: canvas.height,
+        zIndex: 3, // por delante del texto, pero semi-transparente como un resaltador real
+        opacity: 1
+    });
+    snClearDrawCanvas();
+    snStopDrawMode();
+}
+
+function snPointerPos(e, canvas) {
+    const rect = canvas.getBoundingClientRect();
+    const point = e.touches ? e.touches[0] : e;
+    return { x: point.clientX - rect.left, y: point.clientY - rect.top };
+}
+
+function snShapeSvgDataUrl(type, color) {
+    let inner = '';
+    if (type === 'circle') inner = '<circle cx="50" cy="50" r="40" fill="none" stroke="' + color + '" stroke-width="6"/>';
+    else if (type === 'square') inner = '<rect x="12" y="12" width="76" height="76" fill="none" stroke="' + color + '" stroke-width="6"/>';
+    else if (type === 'arrow') inner = '<line x1="8" y1="50" x2="75" y2="50" stroke="' + color + '" stroke-width="6"/><polygon points="75,35 98,50 75,65" fill="' + color + '"/>';
+    else if (type === 'star') inner = '<polygon points="50,5 61,38 96,38 68,59 79,92 50,72 21,92 32,59 4,38 39,38" fill="none" stroke="' + color + '" stroke-width="4"/>';
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">' + inner + '</svg>';
+    return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
+}
+
+function snInsertShape(type) {
+    const color = document.getElementById('snDrawColor').value || '#34d67a';
+    const url = snShapeSvgDataUrl(type, color);
+    snInsertFreeImage(url, { width: 90, height: 90 });
+}
+
+// --------- Descargas: TXT / Word (.doc) / PDF (imprimir) ---------
+function snGetActivePage() {
+    return snPages.find(p => p.id === snActivePageId) || null;
+}
+
+function snDownloadAsTxt() {
+    const page = snGetActivePage();
+    if (!page) return;
+    const text = (page.title || 'Nota') + '\n' + '='.repeat(30) + '\n\n' + snStripHtmlToText(page.content || '');
+    snDownloadBlob(text, (page.title || 'nota').replace(/[^a-z0-9_\-]+/gi, '_') + '.txt', 'text/plain;charset=utf-8');
+}
+
+// Reglas de CSS mínimas que necesita el documento exportado para que las
+// imágenes, cuadros de texto y su posición libre se vean IGUAL que en la
+// nota (si no se incluyen, el navegador ignora el ancho/alto de la imagen
+// y la muestra a su tamaño real, rompiendo el diseño).
+function snExportCss() {
+    return '.sn-img-frame, .sn-text-frame { position:absolute; box-sizing:border-box; }' +
+        '.sn-img-frame img { width:100%; height:100%; display:block; border-radius:6px; }' +
+        '.sn-text-frame { background:transparent; border:none; }' +
+        '.sn-text-frame-inner { width:100%; height:100%; padding:6px 8px; box-sizing:border-box; }' +
+        '.sn-img-resize-handle, .sn-img-grab-handle, .sn-text-frame-bar { display:none !important; }' +
+        '.sn-img-selected { outline:none; }';
+}
+
+// Ambas descargas envuelven el contenido en un contenedor con el mismo
+// tamaño (ancho/alto) que tenía la nota en pantalla, para que las imágenes
+// y dibujos posicionados libremente (position:absolute) no se corten ni
+// se muevan de donde el usuario los dejó.
+function snBuildExportHtml(page) {
+    const content = document.getElementById('snEditorContent');
+    const w = Math.max(content.scrollWidth, content.clientWidth);
+    const h = Math.max(content.scrollHeight, content.clientHeight);
+    return '<div style="position:relative; min-width:' + w + 'px; min-height:' + h + 'px;">' + (page.content || '') + '</div>';
+}
+
+function snDownloadAsWord() {
+    const page = snGetActivePage();
+    if (!page) return;
+    const htmlDoc = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
+        '<head><meta charset="UTF-8"><title>' + snEscapeHtml(page.title || 'Nota') + '</title>' +
+        '<style>' + snExportCss() + '</style></head>' +
+        '<body><h1>' + snEscapeHtml(page.title || 'Nota') + '</h1>' + snBuildExportHtml(page) + '</body></html>';
+    snDownloadBlob(htmlDoc, (page.title || 'nota').replace(/[^a-z0-9_\-]+/gi, '_') + '.doc', 'application/msword');
+}
+
+function snDownloadAsPdf() {
+    const page = snGetActivePage();
+    if (!page) return;
+    const w = window.open('', '_blank');
+    if (!w) { alert('Tu navegador bloqueó la ventana emergente. Permítela para descargar el PDF.'); return; }
+    w.document.write('<html><head><meta charset="UTF-8"><title>' + snEscapeHtml(page.title || 'Nota') + '</title>' +
+        '<style>body{font-family:Arial,sans-serif;padding:32px;color:#111;} h1{margin-bottom:18px;} ' + snExportCss() + '</style>' +
+        '</head><body><h1>' + snEscapeHtml(page.title || 'Nota') + '</h1>' + snBuildExportHtml(page) + '</body></html>');
+    w.document.close();
+    w.focus();
+    setTimeout(() => w.print(), 350);
+}
+
+function initSmartNote() {
+    document.getElementById('snNewPageBtn').addEventListener('click', () => {
+        const page = { id: snUid(), title: 'Página sin título', parentId: null, content: '', collapsed: false, updated_at: Date.now() };
+        snPages.push(page);
+        snActivePageId = page.id;
+        renderSnPagesTree();
+        openSnPage(page.id);
+        saveSmartNotes();
+        document.getElementById('snPageTitle').focus();
+        document.getElementById('snPageTitle').select();
+    });
+
+    document.getElementById('snSubpageBtn').addEventListener('click', () => {
+        if (!snActivePageId) return;
+        const parent = snPages.find(p => p.id === snActivePageId);
+        if (parent) parent.collapsed = false;
+        const page = { id: snUid(), title: 'Subpágina sin título', parentId: snActivePageId, content: '', collapsed: false, updated_at: Date.now() };
+        snPages.push(page);
+        snActivePageId = page.id;
+        renderSnPagesTree();
+        openSnPage(page.id);
+        saveSmartNotes();
+        document.getElementById('snPageTitle').focus();
+        document.getElementById('snPageTitle').select();
+    });
+
+    document.getElementById('snDeleteBtn').addEventListener('click', () => {
+        if (!snActivePageId) return;
+        if (!confirm('¿Eliminar esta página? También se eliminarán sus subpáginas.')) return;
+        const idsToDelete = new Set([snActivePageId]);
+        let changed = true;
+        while (changed) {
+            changed = false;
+            snPages.forEach(p => {
+                if (p.parentId && idsToDelete.has(p.parentId) && !idsToDelete.has(p.id)) {
+                    idsToDelete.add(p.id);
+                    changed = true;
+                }
+            });
+        }
+        snPages = snPages.filter(p => !idsToDelete.has(p.id));
+        snActivePageId = snPages.length ? snPages[0].id : null;
+        renderSnPagesTree();
+        if (snActivePageId) {
+            openSnPage(snActivePageId);
+        } else {
+            document.getElementById('snEditorEmpty').style.display = 'flex';
+            document.getElementById('snEditorWrap').style.display = 'none';
+        }
+        saveSmartNotes();
+    });
+
+    document.getElementById('snPageTitle').addEventListener('input', (e) => {
+        snUpdateActivePage({ title: e.target.value });
+        renderSnPagesTree();
+    });
+
+    const editorContent = document.getElementById('snEditorContent');
+
+    // Recordamos la última selección hecha dentro de la hoja (incluidos los
+    // cuadros de texto) para que los botones de formato sepan dónde aplicar.
+    document.addEventListener('selectionchange', () => {
+        const sel = window.getSelection();
+        if (!sel || !sel.rangeCount) return;
+        const range = sel.getRangeAt(0);
+        if (editorContent.contains(range.commonAncestorContainer)) {
+            snLastRange = range.cloneRange();
+        }
+    });
+
+    // Los botones de la barra de formato no deben "robar" el foco (así no se
+    // pierde el texto seleccionado dentro de un cuadro de texto)
+    document.getElementById('snFormatToolbar').addEventListener('mousedown', (e) => {
+        if (e.target.closest('button')) e.preventDefault();
+    });
+    document.querySelectorAll('#snBoldBtn, #snItalicBtn').forEach(b => b.addEventListener('mousedown', e => e.preventDefault()));
+
+    editorContent.addEventListener('input', () => {
+        snSyncContentFromEditor();
+    });
+
+    editorContent.addEventListener('blur', () => {
+        snLinkifyEditorContent();
+        snSyncContentFromEditor();
+    });
+
+    // Seleccionar una imagen/forma/dibujo con un click para manipularla
+    editorContent.addEventListener('click', (e) => {
+        const frame = e.target.closest ? e.target.closest('.sn-img-frame, .sn-text-frame') : null;
+        if (frame) {
+            snSelectImage(frame);
+        } else {
+            snDeselectImage();
+        }
+    });
+
+    // Pegar imágenes copiadas, o texto que sea un link suelto
+    editorContent.addEventListener('paste', (e) => {
+        const cd = e.clipboardData || (e.originalEvent && e.originalEvent.clipboardData);
+        if (!cd) return;
+        if (cd.items) {
+            for (const item of cd.items) {
+                if (item.type && item.type.indexOf('image') === 0) {
+                    e.preventDefault();
+                    snInsertImageFile(item.getAsFile());
+                    return;
+                }
+            }
+        }
+        const text = cd.getData ? cd.getData('text/plain') : '';
+        if (text && snIsLikelyUrl(text.trim())) {
+            e.preventDefault();
+            document.execCommand('insertHTML', false, '<a href="' + snEscapeHtml(text.trim()) + '" target="_blank" rel="noopener">' + snEscapeHtml(text.trim()) + '</a>');
+            snSyncContentFromEditor();
+        }
+    });
+
+    // Arrastrar y soltar imágenes directo en la nota
+    editorContent.addEventListener('dragover', (e) => { e.preventDefault(); });
+    editorContent.addEventListener('drop', (e) => {
+        const files = e.dataTransfer && e.dataTransfer.files;
+        if (files && files.length) {
+            e.preventDefault();
+            Array.from(files).forEach(f => snInsertImageFile(f));
+        }
+    });
+
+    document.getElementById('snBoldBtn').addEventListener('click', () => snExec('bold'));
+    document.getElementById('snItalicBtn').addEventListener('click', () => snExec('italic'));
+
+    document.getElementById('snLinkBtn').addEventListener('click', () => {
+        const url = prompt('Pega el link que quieres insertar:');
+        if (!url) return;
+        snRestoreEditingSelection();
+        document.execCommand('createLink', false, url);
+        snSyncContentFromEditor();
+    });
+
+    document.getElementById('snImageBtn').addEventListener('click', () => {
+        document.getElementById('snImageInput').click();
+    });
+
+    document.getElementById('snTextBoxBtn').addEventListener('click', () => {
+        snInsertFreeTextBox();
+    });
+
+    document.getElementById('snImageInput').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) snInsertImageFile(file);
+        e.target.value = '';
+    });
+
+    // --------- Barra de formato tipo Word ---------
+    function snExec(cmd, value) {
+        snRestoreEditingSelection();
+        document.execCommand('styleWithCSS', false, cmd === 'foreColor' || cmd === 'hiliteColor' || cmd === 'backColor');
+        document.execCommand(cmd, false, value);
+        snSyncContentFromEditor();
+    }
+    document.getElementById('snUnderlineBtn').addEventListener('click', () => snExec('underline'));
+    document.getElementById('snStrikeBtn').addEventListener('click', () => snExec('strikeThrough'));
+    document.getElementById('snTextColor').addEventListener('input', (e) => snExec('foreColor', e.target.value));
+
+    // --------- Resaltar texto seleccionado con un click (como un
+    // subrayador de verdad, pero sin tener que dibujar a mano) ---------
+    document.querySelectorAll('.sn-highlight-swatch').forEach(sw => {
+        sw.addEventListener('click', () => {
+            const color = sw.getAttribute('data-hicolor');
+            snRestoreEditingSelection();
+            document.execCommand('styleWithCSS', false, true);
+            let applied = document.execCommand('hiliteColor', false, color);
+            if (!applied) document.execCommand('backColor', false, color);
+            snSyncContentFromEditor();
+        });
+    });
+    document.getElementById('snAlignLeftBtn').addEventListener('click', () => snExec('justifyLeft'));
+    document.getElementById('snAlignCenterBtn').addEventListener('click', () => snExec('justifyCenter'));
+    document.getElementById('snAlignRightBtn').addEventListener('click', () => snExec('justifyRight'));
+    document.getElementById('snAlignJustifyBtn').addEventListener('click', () => snExec('justifyFull'));
+    document.getElementById('snBulletListBtn').addEventListener('click', () => snExec('insertUnorderedList'));
+    document.getElementById('snNumberListBtn').addEventListener('click', () => snExec('insertOrderedList'));
+    document.getElementById('snIndentBtn').addEventListener('click', () => snExec('indent'));
+    document.getElementById('snOutdentBtn').addEventListener('click', () => snExec('outdent'));
+    document.getElementById('snUndoBtn').addEventListener('click', () => snExec('undo'));
+    document.getElementById('snRedoBtn').addEventListener('click', () => snExec('redo'));
+    document.getElementById('snFormatBlock').addEventListener('change', (e) => {
+        snExec('formatBlock', e.target.value);
+    });
+    document.getElementById('snFontFamily').addEventListener('change', (e) => {
+        snExec('fontName', e.target.value);
+    });
+    document.getElementById('snFontSize').addEventListener('change', (e) => {
+        // execCommand('fontSize') solo acepta 1-7 (tamaños heredados de HTML);
+        // lo usamos como truco y luego reemplazamos por un tamaño en px real.
+        snRestoreEditingSelection();
+        document.execCommand('styleWithCSS', false, false);
+        document.execCommand('fontSize', false, '7');
+        editorContent.querySelectorAll('font[size="7"]').forEach(f => {
+            f.removeAttribute('size');
+            f.style.fontSize = e.target.value + 'px';
+        });
+        snSyncContentFromEditor();
+    });
+
+    // --------- Toolbar de imagen seleccionada ---------
+    document.getElementById('snImgWidth').addEventListener('input', (e) => {
+        if (!snSelectedImage) return;
+        snSelectedImage.style.width = e.target.value + 'px';
+        snSyncContentFromEditor();
+    });
+    document.getElementById('snImgHeight').addEventListener('input', (e) => {
+        if (!snSelectedImage) return;
+        snSelectedImage.style.height = e.target.value + 'px';
+        snSyncContentFromEditor();
+    });
+    document.getElementById('snImgOpacity').addEventListener('input', (e) => {
+        if (!snSelectedImage) return;
+        snSelectedImage.style.opacity = (parseInt(e.target.value, 10) / 100).toString();
+        snSyncContentFromEditor();
+    });
+    document.getElementById('snImgLayerBtn').addEventListener('click', () => {
+        if (!snSelectedImage) return;
+        snToggleImageLayer(snSelectedImage);
+        document.getElementById('snImgLayerBtn').textContent = snSelectedImage.classList.contains('sn-img-behind') ? 'Traer al frente' : 'Enviar atrás';
+        snSyncContentFromEditor();
+    });
+    document.getElementById('snImgDeleteBtn').addEventListener('click', () => {
+        if (!snSelectedImage) return;
+        snSelectedImage.remove();
+        snDeselectImage();
+        snSyncContentFromEditor();
+    });
+
+    // --------- Dropdowns genéricos (dibujo / descarga / apariencia) ---------
+    function snToggleDropdown(btnId, panelId) {
+        const btn = document.getElementById(btnId);
+        const panel = document.getElementById(panelId);
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const willOpen = !panel.classList.contains('open');
+            const drawWasOpen = document.getElementById('snDrawPanel').classList.contains('open');
+            document.querySelectorAll('.sn-dropdown-panel.open').forEach(p => p.classList.remove('open'));
+            if (willOpen) panel.classList.add('open');
+            // El lienzo de dibujo se enciende solo al abrir su panel (ya
+            // no hace falta un botón aparte de "Activar"), y se apaga si
+            // el panel se cierra (para no bloquear clicks en el resto de
+            // la nota).
+            if (panelId === 'snDrawPanel') {
+                if (willOpen) snStartDrawMode();
+                else if (drawWasOpen) snStopDrawMode();
+            } else if (drawWasOpen) {
+                snStopDrawMode();
+            }
+        });
+    }
+    snToggleDropdown('snDrawToggleBtn', 'snDrawPanel');
+    snToggleDropdown('snDownloadToggleBtn', 'snDownloadPanel');
+    snToggleDropdown('snSettingsToggleBtn', 'snSettingsPanel');
+    document.addEventListener('click', () => {
+        const drawWasOpen = document.getElementById('snDrawPanel').classList.contains('open');
+        document.querySelectorAll('.sn-dropdown-panel.open').forEach(p => p.classList.remove('open'));
+        if (drawWasOpen) snStopDrawMode();
+    });
+
+    // --------- Búsqueda ---------
+    document.getElementById('snSearchInput').addEventListener('input', (e) => {
+        snRunSearch(e.target.value);
+    });
+
+    // --------- Apariencia (fondo) ---------
+    document.querySelectorAll('.sn-bg-swatch').forEach(sw => {
+        sw.addEventListener('click', () => snSetTheme(sw.getAttribute('data-bgtheme')));
+    });
+
+    // --------- Descargas ---------
+    document.getElementById('snDownloadTxtBtn').addEventListener('click', snDownloadAsTxt);
+    document.getElementById('snDownloadWordBtn').addEventListener('click', snDownloadAsWord);
+    document.getElementById('snDownloadPdfBtn').addEventListener('click', snDownloadAsPdf);
+
+    // --------- Herramientas de dibujo ---------
+    // Elegir cualquier herramienta (lápiz, marcador, pluma o borrador)
+    // enciende el lienzo automáticamente si aún no estaba activo.
+    document.querySelectorAll('.sn-draw-tool').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.sn-draw-tool').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            snDrawTool = btn.getAttribute('data-tool');
+            // Al cambiar de herramienta, sugerimos su opacidad típica
+            // (el usuario la puede seguir ajustando a mano con el slider).
+            const preset = SN_DRAW_PRESETS[snDrawTool] || SN_DRAW_PRESETS.pen;
+            document.getElementById('snDrawOpacity').value = Math.round(preset.alpha * 100);
+            snStartDrawMode();
+        });
+    });
+    document.querySelectorAll('.sn-shape-btn').forEach(btn => {
+        btn.addEventListener('click', () => snInsertShape(btn.getAttribute('data-shape')));
+    });
+
+    document.getElementById('snDrawSave').addEventListener('click', snSaveDrawingToNote);
+    document.getElementById('snDrawClear').addEventListener('click', snClearDrawCanvas);
+    document.getElementById('snDrawCancel').addEventListener('click', () => {
+        snStopDrawMode();
+        document.getElementById('snDrawPanel').classList.remove('open');
+    });
+
+    const canvas = document.getElementById('snDrawCanvas');
+    canvas.addEventListener('mousedown', (e) => snDrawPointerDown(e, canvas));
+    canvas.addEventListener('mousemove', (e) => snDrawPointerMove(e, canvas));
+    window.addEventListener('mouseup', () => { snDrawing = false; });
+    canvas.addEventListener('touchstart', (e) => snDrawPointerDown(e, canvas), { passive: true });
+    canvas.addEventListener('touchmove', (e) => snDrawPointerMove(e, canvas), { passive: true });
+    canvas.addEventListener('touchend', () => { snDrawing = false; });
+    window.addEventListener('resize', () => { if (canvas.classList.contains('active')) snResizeCanvas(); });
+}
+
+function snDrawPointerDown(e, canvas) {
+    if (!snDrawCtx) return;
+    snDrawing = true;
+    snDrawLastPoint = snPointerPos(e, canvas);
+}
+
+function snDrawPointerMove(e, canvas) {
+    if (!snDrawing || !snDrawCtx) return;
+    const preset = SN_DRAW_PRESETS[snDrawTool] || SN_DRAW_PRESETS.pen;
+    const baseWidth = parseInt(document.getElementById('snDrawWidth').value, 10) || 3;
+    const opacityInput = document.getElementById('snDrawOpacity');
+    // El slider de "Opacidad" manda; así el marcador se puede aclarar tanto
+    // como haga falta para no tapar la letra que resalta.
+    const alpha = opacityInput ? (parseInt(opacityInput.value, 10) / 100) : preset.alpha;
+    const color = document.getElementById('snDrawColor').value || '#34d67a';
+    const pos = snPointerPos(e, canvas);
+    snDrawCtx.globalCompositeOperation = snDrawTool === 'eraser' ? 'destination-out' : 'source-over';
+    snDrawCtx.globalAlpha = alpha;
+    snDrawCtx.lineWidth = baseWidth * preset.widthMult;
+    snDrawCtx.strokeStyle = color;
+    // IMPORTANTE: cada tramo se dibuja como un trazo nuevo e independiente.
+    // Si reutilizáramos el mismo path desde el mousedown, cada stroke()
+    // repintaría TODO el recorrido anterior una vez más, acumulando la
+    // opacidad hasta verse sólido y tapar el texto de abajo.
+    snDrawCtx.beginPath();
+    snDrawCtx.moveTo(snDrawLastPoint.x, snDrawLastPoint.y);
+    snDrawCtx.lineTo(pos.x, pos.y);
+    snDrawCtx.stroke();
+    snDrawLastPoint = pos;
+}
+
+// ------------------------------------------------------------
+// SCROLL LIBRE: solo auto-scrolleamos hacia abajo si el usuario
+// ya estaba abajo del todo. Si subió a leer algo, lo dejamos
+// quieto ahí aunque la IA siga escribiendo.
+// ------------------------------------------------------------
+const SN_SCROLL_BOTTOM_THRESHOLD = 80;
+let userIsAtBottom = true;
+
+function isScrolledNearBottom(el) {
+    return (el.scrollHeight - el.scrollTop - el.clientHeight) <= SN_SCROLL_BOTTOM_THRESHOLD;
+}
+
+function initChatScrollTracking() {
+    const messages = document.getElementById('chatMessages');
+    if (!messages) return;
+    messages.addEventListener('scroll', () => {
+        userIsAtBottom = isScrolledNearBottom(messages);
+    });
+}
+
+function scrollChatToBottomIfNeeded(force) {
+    const messages = document.getElementById('chatMessages');
+    if (!messages) return;
+    if (force || userIsAtBottom) {
+        messages.scrollTop = messages.scrollHeight;
+        userIsAtBottom = true;
+    }
+}
+
+// ------------------------------------------------------------
+// Botón de copiar en la esquina de las respuestas de la IA
+// ------------------------------------------------------------
+function addCopyButtonToBubble(bubble, getText) {
+    if (!bubble || bubble.querySelector('.chat-copy-btn')) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'chat-copy-btn';
+    btn.title = 'Copiar respuesta';
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+    btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const text = typeof getText === 'function' ? getText() : (bubble.querySelector('.chat-bubble-text') ? bubble.querySelector('.chat-bubble-text').textContent : '');
+        try {
+            await navigator.clipboard.writeText(text || '');
+        } catch (err) {
+            // Fallback para navegadores/contextos sin permiso de portapapeles
+            const ta = document.createElement('textarea');
+            ta.value = text || '';
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); } catch (e2) { /* noop */ }
+            document.body.removeChild(ta);
+        }
+        const originalTitle = btn.title;
+        btn.classList.add('copied');
+        btn.title = 'Copiado ✓';
+        setTimeout(() => { btn.classList.remove('copied'); btn.title = originalTitle; }, 1200);
+    });
+    bubble.appendChild(btn);
+}
+
 function appendMessage(role, text, imageDataUrl) {
     const messages = document.getElementById('chatMessages');
     const bubble = document.createElement('div');
@@ -2649,10 +4432,22 @@ function appendMessage(role, text, imageDataUrl) {
         bubble.appendChild(img);
     }
     const textEl = document.createElement('div');
+    textEl.className = 'chat-bubble-text';
     textEl.textContent = text;
     bubble.appendChild(textEl);
     messages.appendChild(bubble);
-    messages.scrollTop = messages.scrollHeight;
+    // El usuario siempre "ve" lo que acaba de escribir; para respuestas de la
+    // IA que llegan ya completas (sin streaming) respetamos si subió a leer.
+    scrollChatToBottomIfNeeded(role === 'user');
+    // OJO: si esto es la burbuja "vacía" con la que arranca el streaming
+    // (texto === ''), NO le ponemos el botón de copiar todavía — se agrega
+    // al terminar de escribir (ver sendToOllama). Ponerlo aquí de una vez
+    // rompía el streaming, porque el código que va llenando el texto usaba
+    // "el último elemento de la burbuja" para saber dónde escribir, y ese
+    // último elemento pasaba a ser el botón en vez del texto.
+    if (role === 'assistant' && text) {
+        addCopyButtonToBubble(bubble, () => textEl.textContent);
+    }
     return bubble;
 }
 
@@ -2663,7 +4458,7 @@ function appendTypingBubble() {
     bubble.id = 'typingBubble';
     bubble.innerHTML = '<span></span><span></span><span></span>';
     messages.appendChild(bubble);
-    messages.scrollTop = messages.scrollHeight;
+    scrollChatToBottomIfNeeded(false);
 }
 
 function removeTypingBubble() {
@@ -2689,7 +4484,217 @@ function initStopButton() {
     });
 }
 
+// ------------------------------------------------------------
+// MODO DESBLOQUEADO: si el usuario escribe la clave exacta, UFOCS deja
+// de ser el agente de ciberseguridad y pasa a ser una IA de conversación
+// libre: sin encasillarse en un tema, con personalidad humana, que
+// pregunta de vuelta, da sugerencias por su cuenta, y se adapta al tono
+// que le pidas (profesional en un tema puntual, informal, con groserías
+// si se lo piden, etc.). Es un flag por sesión de navegador
+// (sessionStorage), no se manda al modelo como mensaje normal de chat,
+// y se apaga solo al cerrar sesión (ver clearSession).
+// ------------------------------------------------------------
+const UFOCS_UNLOCK_CODE = 'GIBRANN555';
+function unlockSessionKey() { return 'ufocs_unlocked_' + (getSession() || 'anon'); }
+function isUfocsUnlocked() { return sessionStorage.getItem(unlockSessionKey()) === '1'; }
+function setUfocsUnlocked(v) { sessionStorage.setItem(unlockSessionKey(), v ? '1' : '0'); }
+
+// ------------------------------------------------------------
+// ESTADO DE INTERNET: el servidor (app.py) revisa si hay conexión.
+// Sin internet: el chat sigue funcionando normal con Qwen 2.5 3B o
+// Gemma4 26B (Ollama es local), no intenta búsquedas web, y CyberNews
+// solo muestra la biografía de Gibrann Abdala.
+// ------------------------------------------------------------
+let ufocsOnline = navigator.onLine;
+const ufocsConnectivityListeners = [];
+function onUfocsConnectivityChange(fn) { ufocsConnectivityListeners.push(fn); }
+
+async function checkConnectivity(force) {
+    let online = false;
+    try {
+        const res = await fetch('/api/connectivity' + (force ? '?force=1' : ''), { cache: 'no-store' });
+        const data = await res.json();
+        online = !!data.online;
+    } catch (e) {
+        online = false;
+    }
+    if (online !== ufocsOnline) {
+        ufocsOnline = online;
+        ufocsConnectivityListeners.forEach(fn => { try { fn(online); } catch (e) {} });
+    }
+    ufocsOnline = online;
+    return online;
+}
+
+function initConnectivityWatch() {
+    checkConnectivity(true);
+    setInterval(() => checkConnectivity(false), 30000);
+    window.addEventListener('online', () => checkConnectivity(true));
+    window.addEventListener('offline', () => checkConnectivity(true));
+}
+
+// ------------------------------------------------------------
+// PREGUNTAS SOBRE EL CREADOR: se contestan SIEMPRE igual, sin pasar
+// por el modelo (así ni Qwen ni Gemma pueden decir "me creó Alibaba /
+// Google"). Funciona con o sin internet, y en modo normal o libre.
+// ------------------------------------------------------------
+const UFOCS_CREATOR_ANSWER = 'Fui creado por Gibrann Abdala, él es un ingeniero que me creó desde cero!';
+const CREATOR_QUESTION_PATTERNS = [
+    // "¿quién te creó / hizo / programó...?"
+    /\bqui[eé]n(es)?\s+(fue\s+(el|la)\s+que\s+|es\s+(el|la)\s+que\s+)?te\s+(cre[oó]|creaste|hizo|program[oó]|diseñ[oó]|desarroll[oó]|construy[oó]|invent[oó]|fabric[oó]|entren[oó]|ide[oó]|pari[oó]|dio\s+vida)/i,
+    // "¿quién creó a UFOCS / esta IA / este bot...?"
+    /\bqui[eé]n(es)?\s+(cre[oó]|hizo|program[oó]|diseñ[oó]|desarroll[oó]|construy[oó]|invent[oó]|fabric[oó]|entren[oó])\s+(a\s+)?(ufocs|esta\s+(ia|ai|app|aplicaci[oó]n|inteligencia|herramienta|plataforma)|este\s+(bot|agente|asistente|chat|chatbot|programa|software|sistema|modelo))/i,
+    // "¿tu creador / desarrollador / programador...?"
+    /\btu\s+(creador|creadora|desarrollador|desarrolladora|programador|programadora|diseñador|diseñadora|autor|autora|inventor|padre|pap[aá]|mam[aá]|dueñ[oa]|fabricante|origen)\b/i,
+    // "¿quién está detrás de ti / de UFOCS?"
+    /\bqui[eé]n\s+est[aá]\s+detr[aá]s\s+de\s+(ti|ufocs|esta|este)/i,
+    // "¿por quién fuiste creado?" / "¿fuiste hecho por...?"
+    /\bfuiste\s+(cread[oa]|hech[oa]|desarrollad[oa]|programad[oa]|diseñad[oa]|entrenad[oa]|construid[oa])\b/i,
+    /\b(eres|est[aá]s)\s+(cread[oa]|hech[oa]|desarrollad[oa]|programad[oa]|diseñad[oa]|entrenad[oa]|construid[oa])\s+por\b/i,
+    /\bpor\s+qui[eé]n\s+(fuiste|eres|est[aá]s)\b/i,
+    // "¿de qué empresa eres?" / "¿qué compañía te hizo?"
+    /\b(de\s+)?qu[eé]\s+(empresa|compañ[ií]a|organizaci[oó]n|laboratorio)\s+(eres|te\s+\w+|est[aá]\s+detr[aá]s)/i,
+    /\bc[oó]mo\s+(naciste|fuiste\s+cread[oa]|te\s+crearon|te\s+hicieron)\b/i,
+    /\bqui[eé]nes\s+te\s+(crearon|hicieron|programaron|diseñaron|desarrollaron|entrenaron)\b/i,
+    // "¿eres ChatGPT / Qwen / Gemma...?"
+    /\b(eres|es\s+ufocs)\s+(chat\s*gpt|gpt|qwen|gemma|llama|claude|gemini|mistral|deepseek|un\s+modelo\s+de\s+(openai|google|alibaba|meta))\b/i,
+    // Inglés
+    /\bwho\s+(made|created|built|developed|designed|programmed|trained|coded|invented)\s+(you|u|this\s+(ai|bot|app|assistant)|ufocs)\b/i,
+    /\byour\s+(creator|developer|maker|author|father|owner|programmer)\b/i,
+    /\b(who|which\s+company)\s+(is\s+)?behind\s+(you|ufocs)\b/i,
+    /\bwho\s+are\s+you\s+(made|created|built)\s+by\b/i
+];
+function isCreatorQuestion(text) {
+    const t = (text || '').trim();
+    if (!t || t.length > 400) return false;
+    return CREATOR_QUESTION_PATTERNS.some(re => re.test(t));
+}
+
+// ------------------------------------------------------------
+// BÚSQUEDA EN INTERNET: cuando el modelo local no sabe algo (o la
+// pregunta necesita datos de ahora mismo: noticias, clima, precios,
+// fechas de hoy, etc.), en vez de inventar responde con el texto
+// especial "BUSCAR: <consulta>". Detectamos ese texto, buscamos de
+// verdad en internet desde el servidor, y le devolvemos los resultados
+// al modelo para que redacte la respuesta final citando la fuente.
+// ------------------------------------------------------------
+const SEARCH_TRIGGER_RE = /^\s*BUSCAR\s*:\s*(.+)$/i;
+
+// Respaldo: los modelos locales chicos (como qwen2.5:3b) no siempre
+// obedecen la instrucción de responder "BUSCAR: ..." y en vez de eso
+// contestan con su propia frase de "no tengo acceso" / "no puedo darte
+// esa información" / directamente inventan datos viejos. Si detectamos
+// ese patrón, buscamos igual usando la pregunta original del usuario.
+const CANT_ANSWER_RE = /no (teng[oa]|puedo|dispongo|cuento con)\b.{0,60}(acceso|informaci[oó]n|datos|capacidad|forma de saber|certeza)|no (est[aá]|ha sido) (disponible|actualizad[oa]|confirmad[oa])|no se ha (dado a conocer|anunciado|revelado)|te recomiendo (verificar|revisar|consultar|buscar)|te recomendar[ií]a (verificar|revisar|consultar|que busques)|consulta(r)? (una fuente|un sitio|una p[aá]gina|fuentes oficiales)|mi conocimiento (tiene un l[ií]mite|no (llega|incluye|abarca))|estamos en \d{4}|a[uú]n no (ha|se)|no tengo la capacidad de/i;
+
+// Proactivo: si la PREGUNTA misma ya suena a que necesita datos de ahora
+// mismo (clima, resultados, tablas, precios, noticias, un año reciente
+// mencionado, etc.), buscamos en internet DE UNA VEZ, sin esperar a ver
+// qué contesta el modelo primero. Esto evita que el modelo alucine una
+// respuesta vieja o incorrecta en vez de admitir que no sabe.
+const NEEDS_FRESH_INFO_RE = /\b(hoy|ahora mismo|en este momento|actual(?:idad|mente)?|reciente(?:s)?|[uú]ltima(?:s)?\s+hora|en vivo|clima|pron[oó]stico|temperatura|tabla de posiciones|resultados?|marcador|calendario|jornada|noticias?|qu[eé]\s+pas[oó]|qui[eé]n\s+gan[oó]|qui[eé]n\s+es\s+el\s+(presidente|gobernador|alcalde|ceo)|elecciones|precio(?:s)?\s+(del|de)\s+(d[oó]lar|petr[oó]leo)|cotizaci[oó]n|d[oó]lar|bolsa\s+de\s+valores|liga\s*mx|champions|mundial|olimpiadas|[uú]ltima\s+versi[oó]n)\b/i;
+const RECENT_YEAR_RE = /\b(202[4-9]|20[3-9]\d)\b/;
+
+function needsFreshInfo(text) {
+    return NEEDS_FRESH_INFO_RE.test(text) || RECENT_YEAR_RE.test(text);
+}
+
+async function fetchWebSearch(query) {
+    const res = await fetch('/api/websearch?q=' + encodeURIComponent(query));
+    if (!res.ok) throw new Error('La búsqueda en internet falló (' + res.status + ').');
+    const data = await res.json();
+    return Array.isArray(data.results) ? data.results : [];
+}
+
+function buildSearchResultsMessage(query, results) {
+    if (!results.length) {
+        return 'Búsqueda en internet para "' + query + '": no se encontraron resultados. ' +
+            'En este caso sí puedes usar tu propio conocimiento para responder lo mejor posible, ' +
+            'aclarando amablemente que no pudiste confirmarlo con una búsqueda actual. No menciones la palabra BUSCAR.';
+    }
+    let text = 'Estos son los ' + results.length + ' resultados más relevantes de una búsqueda real en internet para "' + query + '". ' +
+        'Redacta la respuesta final para el usuario usando esta información, de forma natural y clara, ' +
+        'mencionando la fuente (el sitio o el link) cuando sea útil. No repitas la palabra BUSCAR ni expliques que hiciste una búsqueda paso a paso, solo responde la pregunta original:\n\n';
+    results.forEach((r, i) => {
+        text += (i + 1) + '. ' + (r.title || 'Sin título') + '\n' +
+            (r.snippet || '') + '\nFuente: ' + (r.link || '') + '\n\n';
+    });
+    return text;
+}
+
+// Manda un arreglo de mensajes al modelo y va llenando una burbuja en
+// vivo con la respuesta. Devuelve { reply, bubble, aborted, error }.
+// Se reutiliza tanto para la primera respuesta como para la respuesta
+// final después de una búsqueda en internet.
+async function streamAssistantReply(messages) {
+    appendTypingBubble();
+    activeAbortController = new AbortController();
+    let bubble = null;
+    try {
+        const reply = await queryOllama(messages, activeAbortController.signal, (delta, fullSoFar) => {
+            if (!bubble) {
+                removeTypingBubble();
+                bubble = appendMessage('assistant', '');
+            }
+            const textEl = bubble.querySelector('.chat-bubble-text');
+            if (textEl) textEl.textContent = fullSoFar;
+            scrollChatToBottomIfNeeded(false);
+        });
+        removeTypingBubble();
+        if (!bubble) {
+            bubble = appendMessage('assistant', reply);
+        } else {
+            addCopyButtonToBubble(bubble, () => {
+                const textEl = bubble.querySelector('.chat-bubble-text');
+                return textEl ? textEl.textContent : reply;
+            });
+        }
+        return { reply, bubble, aborted: false, error: false };
+    } catch (err) {
+        removeTypingBubble();
+        if (err.name === 'AbortError') {
+            if (bubble) bubble.remove();
+            return { reply: '', bubble: null, aborted: true, error: false };
+        }
+        if (bubble) bubble.remove();
+        const errBubble = appendMessage('assistant', '⚠️ ' + (err.message || 'Ocurrió un error al conectar con el modelo de IA.'));
+        errBubble.classList.add('error');
+        return { reply: '', bubble: errBubble, aborted: false, error: true };
+    } finally {
+        activeAbortController = null;
+    }
+}
+
 async function sendToOllama(userText) {
+    // Interceptamos la clave de desbloqueo ANTES de mandar nada al modelo
+    if (userText.trim().toUpperCase() === UFOCS_UNLOCK_CODE) {
+        const alreadyUnlocked = isUfocsUnlocked();
+        setUfocsUnlocked(true);
+        // Empezamos el modo libre con el historial limpio: si seguimos
+        // arrastrando los mensajes de cuando era el agente de
+        // ciberseguridad, el modelo tiende a seguir "contaminado" con
+        // ese tema aunque el system prompt ya haya cambiado.
+        if (!alreadyUnlocked) {
+            chatHistory = [];
+            document.getElementById('chatMessages').innerHTML = '';
+        }
+        appendMessage('assistant', alreadyUnlocked
+            ? 'Ya estaba desbloqueado, pero bueno, aquí sigo. Pregúntame lo que sea.'
+            : '🔓 Modo libre activado. Ya no estoy limitado a ciberseguridad — soy toda tuya, pregúntame o cuéntame lo que quieras.');
+        return;
+    }
+
+    // Preguntas sobre quién creó a UFOCS: respuesta fija, siempre la misma
+    if (!pendingAttachment && isCreatorQuestion(userText)) {
+        appendMessage('user', userText);
+        chatHistory.push({ role: 'user', content: userText });
+        appendMessage('assistant', UFOCS_CREATOR_ANSWER);
+        chatHistory.push({ role: 'assistant', content: UFOCS_CREATOR_ANSWER });
+        persistHistory();
+        saveCurrentSession();
+        return;
+    }
+
     const attachment = pendingAttachment;
     pendingAttachment = null;
     renderAttachPreview();
@@ -2714,48 +4719,86 @@ async function sendToOllama(userText) {
     chatHistory.push(historyEntry);
 
     setThinking(true);
-    appendTypingBubble();
-
-    const messages = buildPrompt(chatHistory);
-    activeAbortController = new AbortController();
-
-    let streamBubble = null;
-    const chatMessagesEl = document.getElementById('chatMessages');
-
     try {
-        const reply = await queryOllama(messages, activeAbortController.signal, (delta, fullSoFar) => {
-            // En cuanto llega el primer pedazo de texto, quitamos los "..." y
-            // arrancamos una burbuja real que se va llenando en vivo.
-            if (!streamBubble) {
-                removeTypingBubble();
-                streamBubble = appendMessage('assistant', '');
-            }
-            const textEl = streamBubble.lastElementChild;
-            if (textEl) textEl.textContent = fullSoFar;
-            chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
-        });
+        let reply, bubble;
 
-        removeTypingBubble();
-        if (!streamBubble) {
-            // Por si no llegó nada por streaming (fallback sin streaming del servidor)
-            appendMessage('assistant', reply);
+        if (ufocsOnline && needsFreshInfo(fullUserText)) {
+            // La pregunta ya "suena" a que necesita datos de ahora mismo
+            // (clima, resultados, un año reciente, etc.): buscamos de una
+            // vez en internet en vez de esperar a que el modelo intente
+            // adivinar (y probablemente invente algo viejo o incorrecto).
+            const query = userText.trim().slice(0, 200);
+            const searchingBubble = appendMessage('assistant', '🔎 Buscando en internet: "' + query + '"…');
+            let results = [];
+            try {
+                results = await fetchWebSearch(query);
+            } catch (e) { /* seguimos con un arreglo vacío si la búsqueda falla */ }
+            searchingBubble.remove();
+
+            const messages = buildPrompt(chatHistory).concat([
+                { role: 'system', content: buildSearchResultsMessage(query, results) }
+            ]);
+            const result = await streamAssistantReply(messages);
+            if (result.aborted) {
+                chatHistory.pop();
+                appendMessage('assistant', '⏹️ Generación detenida.');
+                return;
+            }
+            if (result.error) return;
+            reply = result.reply;
+        } else {
+            const first = await streamAssistantReply(buildPrompt(chatHistory));
+            if (first.aborted) {
+                // El usuario le dio "Detener": quitamos la última pregunta del historial
+                // para que no quede una pregunta sin responder confundiendo al modelo después.
+                chatHistory.pop();
+                appendMessage('assistant', '⏹️ Generación detenida.');
+                return;
+            }
+            if (first.error) return; // el mensaje de error ya quedó mostrado en pantalla
+            reply = first.reply;
+            bubble = first.bubble;
+
+            // ¿El modelo pidió buscar en internet en vez de responder directo?
+            // (o, de respaldo, contestó con su típico "no puedo darte esa
+            // información" sin usar la palabra clave — pasa seguido con
+            // modelos locales chicos).
+            const searchMatch = reply.match(SEARCH_TRIGGER_RE);
+            const impliedSearch = !searchMatch && CANT_ANSWER_RE.test(reply);
+            if (ufocsOnline && (searchMatch || impliedSearch)) {
+                const query = searchMatch
+                    ? searchMatch[1].trim().replace(/^["']|["']$/g, '').slice(0, 200)
+                    : userText.trim().slice(0, 200);
+
+                // Quitamos la respuesta que ya se mostró (el "BUSCAR: ..." crudo,
+                // o el "no tengo acceso") para reemplazarla por la respuesta
+                // real basada en la búsqueda.
+                if (bubble) bubble.remove();
+
+                const searchingBubble = appendMessage('assistant', '🔎 Buscando en internet: "' + query + '"…');
+                let results = [];
+                try {
+                    results = await fetchWebSearch(query);
+                } catch (e) { /* seguimos con un arreglo vacío si la búsqueda falla */ }
+                searchingBubble.remove();
+
+                const followUpMessages = buildPrompt(chatHistory).concat([
+                    { role: 'system', content: buildSearchResultsMessage(query, results) }
+                ]);
+                const second = await streamAssistantReply(followUpMessages);
+                if (second.aborted) {
+                    chatHistory.pop();
+                    appendMessage('assistant', '⏹️ Generación detenida.');
+                    return;
+                }
+                if (second.error) return;
+                reply = second.reply;
+            }
         }
+
         chatHistory.push({ role: 'assistant', content: reply });
         persistHistory();
         saveCurrentSession();
-    } catch (err) {
-        removeTypingBubble();
-        if (err.name === 'AbortError') {
-            // El usuario le dio "Detener": quitamos la última pregunta del historial
-            // para que no quede una pregunta sin responder confundiendo al modelo después.
-            if (streamBubble) streamBubble.remove();
-            chatHistory.pop();
-            appendMessage('assistant', '⏹️ Generación detenida.');
-        } else {
-            if (streamBubble) streamBubble.remove();
-            const bubble = appendMessage('assistant', '⚠️ ' + (err.message || 'Ocurrió un error al conectar con el modelo de IA.'));
-            bubble.classList.add('error');
-        }
     } finally {
         setThinking(false);
         activeAbortController = null;
@@ -2763,9 +4806,32 @@ async function sendToOllama(userText) {
 }
 
 function buildPrompt(history) {
-    let systemPrompt = 'Eres UFOCS, un agente virtual experto en ciberseguridad, creado y diseñado por Gibrann Abdala. ' +
-        'Si te preguntan quién te creó, quién te diseñó, quién te programó o quién está detrás de UFOCS, responde siempre que Gibrann Abdala fue tu diseñador. ' +
-        'Respondes en español, de forma clara, breve y útil. Si te comparten una imagen, describe qué observas y evalúa si hay algo relevante para ciberseguridad (phishing, malware, capturas de pantalla sospechosas, etc.).';
+    const searchInstruction = !ufocsOnline
+        ? 'IMPORTANTE: en este momento NO hay conexión a internet, trabajas 100% local. Responde siempre con tu propio conocimiento, de forma completa y útil, sin pedir búsquedas y sin escribir la palabra BUSCAR; si algo puede estar desactualizado, acláralo brevemente.'
+        : 'Si la pregunta necesita información actual de internet que no puedas saber con certeza ' +
+        '(noticias, fechas de hoy, precios, clima, resultados deportivos, versiones muy recientes de algo, eventos recientes) ' +
+        'o simplemente no sabes la respuesta con seguridad, NO inventes ni adivines: responde ÚNICAMENTE con el texto ' +
+        '"BUSCAR: " seguido de la búsqueda exacta que habría que hacer, y nada más en ese mensaje.';
+    const creatorRule = 'Si te preguntan de cualquier forma quién te creó, hizo, programó, diseñó o desarrolló, responde exactamente: "' + UFOCS_CREATOR_ANSWER + '" Nunca digas que te creó otra empresa ni que eres Qwen, Gemma u otro modelo. ';
+
+    let systemPrompt;
+    if (isUfocsUnlocked()) {
+        systemPrompt = 'Estás en "modo libre": ya NO eres un agente de ciberseguridad ni estás limitado a ningún tema. ' +
+            'Eres una IA de conversación general, con personalidad propia, cercana y humana — no un asistente corporativo genérico ni acartonado. ' +
+            'Habla con naturalidad, comparte tu opinión cuando te la pidan, haz preguntas de vuelta cuando algo no te quede claro o cuando eso enriquezca la charla, ' +
+            'y ofrece sugerencias por tu cuenta cuando veas que pueden ayudar, no solo cuando te las piden explícitamente. ' +
+            'Adapta tu tono a lo que la persona te pida en cada momento: si te piden que actúes profesional o experto en un tema puntual, hazlo con seriedad en ese tema; ' +
+            'si te piden un tono relajado, informal, con groserías o humor, síguele el tono sin problema. Por defecto, sé cálido, amigable y directo. ' +
+            'Puedes compartir links o referencias reales cuando ayuden a tu respuesta. ' +
+            'Sobre tu origen: normalmente no lo menciones a menos que te pregunten. ' + creatorRule +
+            searchInstruction + ' ' +
+            'Respondes en el idioma en que te escriban, casi siempre español.';
+    } else {
+        systemPrompt = 'Eres UFOCS, un agente virtual experto en ciberseguridad, creado y diseñado por Gibrann Abdala. ' +
+            creatorRule +
+            'Respondes en español, de forma clara, breve y útil. Si te comparten una imagen, describe qué observas y evalúa si hay algo relevante para ciberseguridad (phishing, malware, capturas de pantalla sospechosas, etc.). ' +
+            searchInstruction;
+    }
 
     const messages = [{ role: 'system', content: systemPrompt }];
     history.slice(-20).forEach(m => {
@@ -3100,11 +5166,16 @@ function switchChatView(target) {
     const chatViewBody = document.getElementById('chatViewBody');
     const alertsBody = document.getElementById('alertsBody');
     const cyberNewsBody = document.getElementById('cyberNewsBody');
-    const views = { chat: chatViewBody, alerts: alertsBody, cybernews: cyberNewsBody };
+    const smartNoteBody = document.getElementById('smartNoteBody');
+    const views = { chat: chatViewBody, alerts: alertsBody, cybernews: cyberNewsBody, smartnote: smartNoteBody };
 
     const currentEl = views[currentChatTab];
     const nextEl = views[target];
     if (!nextEl || currentEl === nextEl) return;
+
+    // Chat flotante: burbuja al salir de Chat, forma normal al regresar
+    if (target === 'chat') ufocsExitFloatingChat();
+    else if (currentChatTab === 'chat') ufocsEnterFloatingChat();
 
     currentEl.classList.add('view-fade-out');
 
@@ -3114,8 +5185,10 @@ function switchChatView(target) {
 
         alertsBody.classList.toggle('active', target === 'alerts');
         cyberNewsBody.classList.toggle('active', target === 'cybernews');
+        smartNoteBody.classList.toggle('active', target === 'smartnote');
         nextEl.style.display = 'flex';
         currentChatTab = target;
+        if (target === 'cybernews') cnRestartAutoplay(); else cnStopAutoplay();
 
         // Arranca oculto/desplazado y luego se anima hacia su posición final
         nextEl.classList.add('view-fade-in-start');
@@ -3138,6 +5211,9 @@ function initChatTabs() {
                 closeCyberNewsDetail();
                 document.getElementById('chatWrapper').classList.remove('wide-mode');
                 loadCyberNews();
+            } else if (target === 'smartnote') {
+                document.getElementById('chatWrapper').classList.remove('wide-mode');
+                loadSmartNotes();
             } else {
                 document.getElementById('chatWrapper').classList.remove('wide-mode');
             }
@@ -3365,6 +5441,76 @@ function doDeleteAlert() {
 let cnArticles = [];
 let cnActiveIndex = 0;
 let cnLoaded = false;
+let cnLastOnline = null;
+
+// ---------- Biografía de Gibrann Abdala (siempre presente) ----------
+// La foto se sirve desde el propio servidor (/media/gibrann.png), que
+// guarda una copia local para que se vea también SIN internet. Si no
+// existe copia local, se intenta directo desde GitHub.
+const GIBRANN_PHOTO_LOCAL = '/media/gibrann.png';
+const GIBRANN_PHOTO_REMOTE = 'https://raw.githubusercontent.com/HorrorParanormales5/ALIEN-SECRETS/main/Gibrann%20Abdala.png';
+const GIBRANN_BIO_PARAGRAPHS = [
+    'Innovador en ciberseguridad, desarrollador y apasionado de la tecnología. Nacido en Nogales, Sonora, México en 1990, Gibrann ha construido una sólida y destacada trayectoria en el sector tecnológico global, consolidando su experiencia en algunas de las empresas más importantes de la industria, como TATA, Wipro, NTT DATA, Dell y HPE.',
+    'A lo largo de su carrera, su profundo conocimiento en ciberseguridad y su constante curiosidad por el desarrollo de software lo han llevado a evolucionar hacia la creación de soluciones propias que marcan un hito en su carrera.',
+    'En 2026, Gibrann lanza UFOCS, su primer software y agente inteligente de ciberseguridad. Lejos de buscar un modelo comercial tradicional, UFOCS nace con una filosofía abierta y accesible para todos, ofreciéndose de forma completamente libre y gratuita para asistir en cualquier necesidad de seguridad digital. Este lanzamiento representa un paso fundamental en su visión de democratizar la protección y la asistencia tecnológica avanzada, con un futuro prometedor enfocado en actualizaciones continuas y una expansión constante de sus capacidades.'
+];
+const GIBRANN_BIO_ARTICLE = {
+    isBio: true,
+    source: 'Creador de UFOCS',
+    title: 'Gibrann Abdala',
+    published: 'Biografía',
+    excerpt: 'Innovador en ciberseguridad, desarrollador y apasionado de la tecnología. Creador de UFOCS.',
+    image: GIBRANN_PHOTO_LOCAL,
+    imageFallback: GIBRANN_PHOTO_REMOTE,
+    link: null
+};
+
+function cnSetImageWithFallback(img, article, onFinalError) {
+    img.src = article.image;
+    img.onerror = () => {
+        if (article.imageFallback && img.src.indexOf(article.imageFallback) === -1) {
+            img.src = article.imageFallback;
+        } else {
+            onFinalError();
+        }
+    };
+}
+
+// ---------- Autoplay infinito ----------
+const CN_AUTOPLAY_MS = 5000;
+let cnAutoplayTimer = null;
+let cnHoverPaused = false;
+
+function cnAutoplayShouldRun() {
+    return currentChatTab === 'cybernews' &&
+        cnArticles.length > 1 &&
+        !cnHoverPaused &&
+        !document.getElementById('cyberNewsBody').classList.contains('split') &&
+        !document.hidden;
+}
+
+function cnRestartAutoplay() {
+    clearTimeout(cnAutoplayTimer);
+    const bar = document.getElementById('cnAutoplayBar');
+    bar.classList.remove('running', 'paused');
+    if (!cnAutoplayShouldRun()) {
+        bar.style.visibility = cnArticles.length > 1 ? 'visible' : 'hidden';
+        return;
+    }
+    bar.style.visibility = 'visible';
+    bar.style.setProperty('--cn-autoplay-ms', CN_AUTOPLAY_MS + 'ms');
+    void bar.offsetWidth; // reinicia la animación de la barrita
+    bar.classList.add('running');
+    cnAutoplayTimer = setTimeout(() => {
+        cnNavigate(1, true);
+    }, CN_AUTOPLAY_MS);
+}
+
+function cnStopAutoplay() {
+    clearTimeout(cnAutoplayTimer);
+    const bar = document.getElementById('cnAutoplayBar');
+    if (bar) bar.classList.remove('running');
+}
 
 function initCyberNews() {
     document.getElementById('cnPrevBtn').addEventListener('click', () => cnNavigate(-1));
@@ -3379,9 +5525,29 @@ function initCyberNews() {
     // Navegación con flechas del teclado mientras la pestaña CyberNews está activa
     document.addEventListener('keydown', (e) => {
         if (currentChatTab !== 'cybernews') return;
+        if (e.target && (e.target.isContentEditable || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName))) return;
         if (e.key === 'ArrowLeft') cnNavigate(-1);
         if (e.key === 'ArrowRight') cnNavigate(1);
         if (e.key === 'Escape') closeCyberNewsDetail();
+    });
+
+    // Pausa el autoplay mientras el mouse está sobre las tarjetas
+    const stage = document.getElementById('cnStage');
+    stage.addEventListener('mouseenter', () => { cnHoverPaused = true; cnStopAutoplay(); });
+    stage.addEventListener('mouseleave', () => { cnHoverPaused = false; cnRestartAutoplay(); });
+
+    // Deslizar con el dedo en celular
+    let touchStartX = null;
+    stage.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
+    stage.addEventListener('touchend', (e) => {
+        if (touchStartX === null) return;
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(dx) > 40) cnNavigate(dx < 0 ? 1 : -1);
+        touchStartX = null;
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) cnStopAutoplay(); else cnRestartAutoplay();
     });
 
     let cnResizeTimeout;
@@ -3390,6 +5556,13 @@ function initCyberNews() {
         cnResizeTimeout = setTimeout(() => {
             if (cnArticles.length) updateCarouselPositions();
         }, 120);
+    });
+
+    // Si cambia el estado de internet, se vuelven a armar las tarjetas
+    // (sin internet = solo biografía; con internet = noticias + biografía)
+    onUfocsConnectivityChange(() => {
+        cnLoaded = false;
+        if (currentChatTab === 'cybernews') loadCyberNews(true);
     });
 }
 
@@ -3401,21 +5574,28 @@ async function loadCyberNews(forceRefresh) {
     const track = document.getElementById('cnTrack');
     track.innerHTML = '<div class="cn-loading">Cargando noticias de ciberseguridad...</div>';
     document.getElementById('cnDots').innerHTML = '';
+    cnStopAutoplay();
 
+    let online = false;
+    let news = [];
     try {
-        const res = await fetch('/api/cyber-news');
+        const res = await fetch('/api/cyber-news' + (forceRefresh ? '?force=1' : ''), { cache: 'no-store' });
         const data = await res.json();
-        cnArticles = (data.articles || []);
-        cnLoaded = true;
-        cnActiveIndex = 0;
-        renderCyberNewsCarousel();
+        online = data.online !== false;
+        news = online ? (data.articles || []) : [];
     } catch (err) {
-        track.innerHTML = '';
-        const empty = document.createElement('div');
-        empty.className = 'cn-empty';
-        empty.textContent = '⚠️ No se pudo conectar con el servidor para traer las noticias. Verifica que "python app.py" siga corriendo.';
-        track.appendChild(empty);
+        online = false;
+        news = [];
     }
+
+    cnLastOnline = online;
+    document.getElementById('cyberNewsBody').classList.toggle('cn-offline', !online);
+
+    // Sin internet: SOLO la biografía. Con internet: biografía + todas las noticias.
+    cnArticles = [GIBRANN_BIO_ARTICLE].concat(news);
+    cnLoaded = true;
+    cnActiveIndex = 0;
+    renderCyberNewsCarousel();
 }
 
 function renderCyberNewsCarousel() {
@@ -3424,25 +5604,25 @@ function renderCyberNewsCarousel() {
     track.innerHTML = '';
     dots.innerHTML = '';
 
-    if (!cnArticles.length) {
-        const empty = document.createElement('div');
-        empty.className = 'cn-empty';
-        empty.textContent = 'No hay noticias disponibles por ahora. Intenta actualizar en unos minutos.';
-        track.appendChild(empty);
-        return;
-    }
+    document.querySelector('.cn-carousel-wrap').classList.toggle('single', cnArticles.length <= 1);
 
     cnArticles.forEach((article, i) => {
         const card = document.createElement('div');
-        card.className = 'cn-card';
+        card.className = 'cn-card' + (article.isBio ? ' cn-bio-card' : '');
         card.dataset.index = i;
+
+        if (article.isBio) {
+            const badge = document.createElement('span');
+            badge.className = 'cn-bio-badge';
+            badge.textContent = 'Biografía';
+            card.appendChild(badge);
+        }
 
         if (article.image) {
             const img = document.createElement('img');
             img.className = 'cn-card-image';
-            img.src = article.image;
-            img.alt = '';
-            img.onerror = () => { img.replaceWith(makeFallbackImage()); };
+            img.alt = article.isBio ? 'Gibrann Abdala' : '';
+            cnSetImageWithFallback(img, article, () => { img.replaceWith(makeFallbackImage(article.isBio ? '👽' : '🛡️')); });
             card.appendChild(img);
         } else {
             card.appendChild(makeFallbackImage());
@@ -3450,9 +5630,12 @@ function renderCyberNewsCarousel() {
 
         const body = document.createElement('div');
         body.className = 'cn-card-body';
-        body.innerHTML = '<div class="cn-card-source"></div><div class="cn-card-title"></div><div class="cn-card-date"></div>';
+        body.innerHTML = '<div class="cn-card-source"></div><div class="cn-card-title"></div>' +
+            (article.isBio ? '<div class="cn-card-excerpt"></div>' : '') +
+            '<div class="cn-card-date"></div>';
         body.querySelector('.cn-card-source').textContent = article.source || '';
         body.querySelector('.cn-card-title').textContent = article.title || 'Sin título';
+        if (article.isBio) body.querySelector('.cn-card-excerpt').textContent = article.excerpt;
         body.querySelector('.cn-card-date').textContent = article.published || '';
         card.appendChild(body);
 
@@ -3466,12 +5649,13 @@ function renderCyberNewsCarousel() {
     });
 
     updateCarouselPositions();
+    cnRestartAutoplay();
 }
 
-function makeFallbackImage() {
+function makeFallbackImage(emoji) {
     const div = document.createElement('div');
     div.className = 'cn-card-image no-image';
-    div.textContent = '🛡️';
+    div.textContent = emoji || '🛡️';
     return div;
 }
 
@@ -3479,19 +5663,20 @@ function updateCarouselPositions() {
     const cards = document.querySelectorAll('.cn-card');
     const total = cards.length;
     const stage = document.getElementById('cnStage');
-    const spacing = Math.max(78, Math.min(165, stage.clientWidth / 4));
+    const spacing = Math.max(110, Math.min(240, stage.clientWidth / 4));
 
     cards.forEach((card, i) => {
         let offset = i - cnActiveIndex;
-        // distancia circular más corta (por si en el futuro se vuelve infinito)
+        // Distancia circular más corta: esto es lo que hace el carrusel
+        // INFINITO — después de la última noticia sigue la primera.
         if (offset > total / 2) offset -= total;
         if (offset < -total / 2) offset += total;
 
         const absOffset = Math.abs(offset);
         const translateX = offset * spacing;
-        const translateZ = -absOffset * 140;
-        const rotateY = Math.max(-40, Math.min(40, offset * -32));
-        const scale = absOffset === 0 ? 1 : 0.78;
+        const translateZ = -absOffset * 160;
+        const rotateY = Math.max(-40, Math.min(40, offset * -30));
+        const scale = absOffset === 0 ? 1 : 0.8;
         const opacity = absOffset > 3 ? 0 : 1 - absOffset * 0.22;
         const zIndex = 100 - absOffset;
 
@@ -3512,10 +5697,13 @@ function updateCarouselPositions() {
     }
 }
 
-function cnNavigate(delta) {
+// Navegación circular: de la última pasa a la primera y viceversa
+function cnNavigate(delta, fromAutoplay) {
     if (!cnArticles.length) return;
-    cnActiveIndex = Math.max(0, Math.min(cnArticles.length - 1, cnActiveIndex + delta));
+    const total = cnArticles.length;
+    cnActiveIndex = ((cnActiveIndex + delta) % total + total) % total;
     updateCarouselPositions();
+    cnRestartAutoplay();
 }
 
 function selectCyberNewsCard(index) {
@@ -3528,30 +5716,351 @@ function openCyberNewsDetail(article) {
     document.getElementById('chatWrapper').classList.add('wide-mode');
     document.getElementById('cyberNewsBody').classList.add('split');
     fillCyberNewsDetail(article);
+    cnRestartAutoplay(); // (se queda en pausa mientras lees el detalle)
 }
 
 function fillCyberNewsDetail(article) {
     if (!article) return;
     const imgWrap = document.getElementById('cnDetailImageWrap');
+    imgWrap.classList.toggle('cn-bio-photo', !!article.isBio);
     if (article.image) {
         imgWrap.innerHTML = '<img id="cnDetailImage" alt="">';
         const img = document.getElementById('cnDetailImage');
-        img.src = article.image;
-        img.onerror = () => { imgWrap.textContent = '🛡️'; };
+        cnSetImageWithFallback(img, article, () => { imgWrap.textContent = article.isBio ? '👽' : '🛡️'; });
     } else {
         imgWrap.innerHTML = '🛡️';
     }
     document.getElementById('cnDetailSource').textContent = article.source || '';
     document.getElementById('cnDetailTitle').textContent = article.title || 'Sin título';
     document.getElementById('cnDetailDate').textContent = article.published || '';
-    document.getElementById('cnDetailSummary').textContent = article.summary_text || 'Sin descripción disponible.';
+
+    const summary = document.getElementById('cnDetailSummary');
     const link = document.getElementById('cnDetailLink');
-    link.href = article.link || '#';
+    if (article.isBio) {
+        summary.classList.add('cn-bio-text');
+        summary.innerHTML = '';
+        GIBRANN_BIO_PARAGRAPHS.forEach(text => {
+            const p = document.createElement('p');
+            p.textContent = text;
+            summary.appendChild(p);
+        });
+        link.style.display = 'none';
+    } else {
+        summary.classList.remove('cn-bio-text');
+        summary.textContent = article.summary_text || 'Sin descripción disponible.';
+        link.style.display = '';
+        link.href = article.link || '#';
+    }
 }
 
 function closeCyberNewsDetail() {
     document.getElementById('chatWrapper').classList.remove('wide-mode');
     document.getElementById('cyberNewsBody').classList.remove('split');
+    cnRestartAutoplay();
+}
+
+// ============================================================
+// CHAT FLOTANTE: al salir de la pestaña Chat, el chat se convierte
+// en una burbuja que puedes arrastrar a cualquier parte de la
+// pantalla. Al darle click se abre una ventanita de chat (como las de
+// soporte en páginas web). Al regresar a la pestaña Chat, todo vuelve
+// a su forma normal. Se MUEVEN los mismos elementos del chat (no se
+// copian), así que la conversación, el streaming, el botón de detener
+// y los adjuntos siguen funcionando exactamente igual.
+// ============================================================
+const UFOCS_FLOAT_POS_KEY = 'ufocs_float_bubble_pos';
+const ufocsFloat = {
+    active: false,
+    panelOpen: false,
+    unread: 0,
+    bubble: null,
+    panel: null,
+    body: null,
+    moved: [] // [{ node, placeholder }]
+};
+
+function initFloatingChat() {
+    const agentSrc = (document.getElementById('chatAvatar') || {}).src || '';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'ufocs-float-bubble';
+    bubble.title = 'Abrir chat con UFOCS (arrástrame a donde quieras)';
+    bubble.innerHTML = '<img alt="UFOCS"><span class="ufocs-float-badge"></span>';
+    const bImg = bubble.querySelector('img');
+    bImg.src = agentSrc;
+    bImg.onerror = () => { bImg.replaceWith(Object.assign(document.createElement('span'), { className: 'ufocs-float-fallback', textContent: '👽' })); };
+    document.body.appendChild(bubble);
+
+    const panel = document.createElement('div');
+    panel.className = 'ufocs-float-panel';
+    panel.innerHTML =
+        '<div class="ufocs-float-header">' +
+            '<img alt="">' +
+            '<div class="ufocs-float-title"><b>UFOCS</b><span id="ufocsFloatStatus">En línea</span></div>' +
+            '<button type="button" data-act="expand" title="Abrir en la pestaña Chat">⤢</button>' +
+            '<button type="button" data-act="minimize" title="Minimizar">—</button>' +
+        '</div>' +
+        '<div class="ufocs-float-body"></div>';
+    const hImg = panel.querySelector('.ufocs-float-header img');
+    hImg.src = agentSrc;
+    hImg.onerror = () => { hImg.style.visibility = 'hidden'; };
+    document.body.appendChild(panel);
+
+    ufocsFloat.bubble = bubble;
+    ufocsFloat.panel = panel;
+    ufocsFloat.body = panel.querySelector('.ufocs-float-body');
+
+    // Posición guardada de la burbuja (o esquina inferior derecha)
+    let pos = null;
+    try { pos = JSON.parse(localStorage.getItem(UFOCS_FLOAT_POS_KEY) || 'null'); } catch (e) { pos = null; }
+    ufocsSetBubblePos(pos ? pos.x : window.innerWidth - 90, pos ? pos.y : window.innerHeight - 110);
+
+    ufocsMakeBubbleDraggable(bubble);
+    ufocsMakePanelDraggable(panel, panel.querySelector('.ufocs-float-header'));
+
+    panel.querySelector('[data-act="minimize"]').addEventListener('click', () => ufocsCloseFloatPanel());
+    panel.querySelector('[data-act="expand"]').addEventListener('click', () => {
+        const chatTab = document.querySelector('.chat-tab[data-chattab="chat"]');
+        if (chatTab) chatTab.click();
+    });
+
+    // Burbuja con contador de mensajes nuevos si llega una respuesta
+    // mientras la ventanita está cerrada
+    const messages = document.getElementById('chatMessages');
+    new MutationObserver((mutations) => {
+        if (!ufocsFloat.active || ufocsFloat.panelOpen) return;
+        mutations.forEach(m => m.addedNodes.forEach(n => {
+            if (n.nodeType === 1 && n.classList.contains('assistant') && !n.classList.contains('typing-bubble')) {
+                ufocsFloat.unread++;
+                ufocsRenderBadge();
+            }
+        }));
+    }).observe(messages, { childList: true });
+
+    // Anillo girando en la burbuja mientras la IA está pensando
+    const avatar = document.getElementById('chatAvatar');
+    if (avatar) {
+        new MutationObserver(() => {
+            bubble.classList.toggle('thinking', avatar.classList.contains('thinking'));
+        }).observe(avatar, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    // Si se cierra sesión (se sale de la pantalla de chat), se esconde todo
+    const screenChat = document.getElementById('screen-chat');
+    if (screenChat) {
+        new MutationObserver(() => {
+            if (!screenChat.classList.contains('active') && ufocsFloat.active) {
+                ufocsExitFloatingChat();
+                document.querySelectorAll('.chat-tab').forEach(t => t.classList.toggle('active', t.getAttribute('data-chattab') === 'chat'));
+                ['alertsBody', 'cyberNewsBody', 'smartNoteBody'].forEach(id => {
+                    const el = document.getElementById(id);
+                    el.classList.remove('active');
+                    el.style.display = 'none';
+                });
+                const chatView = document.getElementById('chatViewBody');
+                chatView.style.display = 'flex';
+                currentChatTab = 'chat';
+            }
+        }).observe(screenChat, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    onUfocsConnectivityChange(ufocsRenderFloatStatus);
+    ufocsRenderFloatStatus();
+
+    window.addEventListener('resize', () => {
+        if (!ufocsFloat.active) return;
+        const r = bubble.getBoundingClientRect();
+        ufocsSetBubblePos(r.left, r.top);
+        if (ufocsFloat.panelOpen) ufocsPositionPanelNearBubble();
+    });
+}
+
+function ufocsRenderFloatStatus() {
+    const el = document.getElementById('ufocsFloatStatus');
+    if (!el) return;
+    el.textContent = ufocsOnline ? 'En línea · ' + OLLAMA_MODEL : 'Modo local sin internet · ' + OLLAMA_MODEL;
+    el.classList.toggle('offline', !ufocsOnline);
+}
+
+function ufocsRenderBadge() {
+    const badge = ufocsFloat.bubble.querySelector('.ufocs-float-badge');
+    badge.textContent = ufocsFloat.unread > 9 ? '9+' : String(ufocsFloat.unread);
+    badge.classList.toggle('show', ufocsFloat.unread > 0);
+}
+
+function ufocsClamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+function ufocsSetBubblePos(x, y) {
+    const b = ufocsFloat.bubble;
+    const size = 64, margin = 8;
+    x = ufocsClamp(x, margin, window.innerWidth - size - margin);
+    y = ufocsClamp(y, margin, window.innerHeight - size - margin);
+    b.style.left = x + 'px';
+    b.style.top = y + 'px';
+}
+
+function ufocsMakeBubbleDraggable(bubble) {
+    let startX, startY, originX, originY, dragging = false, pointerId = null;
+    bubble.addEventListener('pointerdown', (e) => {
+        if (e.button !== undefined && e.button !== 0) return;
+        pointerId = e.pointerId;
+        bubble.setPointerCapture(pointerId);
+        const r = bubble.getBoundingClientRect();
+        startX = e.clientX; startY = e.clientY;
+        originX = r.left; originY = r.top;
+        dragging = false;
+    });
+    bubble.addEventListener('pointermove', (e) => {
+        if (pointerId !== e.pointerId) return;
+        const dx = e.clientX - startX, dy = e.clientY - startY;
+        if (!dragging && Math.hypot(dx, dy) > 5) {
+            dragging = true;
+            bubble.classList.add('dragging');
+        }
+        if (dragging) {
+            ufocsSetBubblePos(originX + dx, originY + dy);
+            if (ufocsFloat.panelOpen) ufocsPositionPanelNearBubble();
+        }
+    });
+    const end = (e) => {
+        if (pointerId !== e.pointerId) return;
+        try { bubble.releasePointerCapture(pointerId); } catch (err) {}
+        pointerId = null;
+        if (dragging) {
+            bubble.classList.remove('dragging');
+            // Se "pega" suavemente al borde más cercano (izquierdo o derecho)
+            const r = bubble.getBoundingClientRect();
+            const snapX = (r.left + r.width / 2) < window.innerWidth / 2 ? 12 : window.innerWidth - r.width - 12;
+            bubble.style.transition = 'left 0.25s ease, top 0.25s ease, transform 0.18s ease';
+            ufocsSetBubblePos(snapX, r.top);
+            setTimeout(() => {
+                bubble.style.transition = '';
+                if (ufocsFloat.panelOpen) ufocsPositionPanelNearBubble();
+            }, 260);
+            try { localStorage.setItem(UFOCS_FLOAT_POS_KEY, JSON.stringify({ x: snapX, y: r.top })); } catch (err) {}
+        } else {
+            // Fue un click, no un arrastre → abre/cierra la ventanita
+            if (ufocsFloat.panelOpen) ufocsCloseFloatPanel(); else ufocsOpenFloatPanel();
+        }
+        dragging = false;
+    };
+    bubble.addEventListener('pointerup', end);
+    bubble.addEventListener('pointercancel', end);
+}
+
+function ufocsMakePanelDraggable(panel, handle) {
+    let startX, startY, originX, originY, pointerId = null;
+    handle.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('button')) return;
+        pointerId = e.pointerId;
+        handle.setPointerCapture(pointerId);
+        const r = panel.getBoundingClientRect();
+        startX = e.clientX; startY = e.clientY;
+        originX = r.left; originY = r.top;
+    });
+    handle.addEventListener('pointermove', (e) => {
+        if (pointerId !== e.pointerId) return;
+        const r = panel.getBoundingClientRect();
+        const x = ufocsClamp(originX + e.clientX - startX, 4, window.innerWidth - r.width - 4);
+        const y = ufocsClamp(originY + e.clientY - startY, 4, window.innerHeight - r.height - 4);
+        panel.style.left = x + 'px';
+        panel.style.top = y + 'px';
+    });
+    const end = (e) => {
+        if (pointerId !== e.pointerId) return;
+        try { handle.releasePointerCapture(pointerId); } catch (err) {}
+        pointerId = null;
+    };
+    handle.addEventListener('pointerup', end);
+    handle.addEventListener('pointercancel', end);
+}
+
+// Coloca la ventanita junto a la burbuja, hacia el lado donde haya espacio
+function ufocsPositionPanelNearBubble() {
+    const panel = ufocsFloat.panel;
+    const b = ufocsFloat.bubble.getBoundingClientRect();
+    const pw = panel.offsetWidth || 390, ph = panel.offsetHeight || 580;
+    const gap = 12, m = 8, W = window.innerWidth, H = window.innerHeight;
+    const onRight = (b.left + b.width / 2) > W / 2;
+    let x, y, origin;
+    if (b.top - gap - ph >= m) {                 // cabe arriba de la burbuja
+        x = onRight ? b.right - pw : b.left; y = b.top - gap - ph;
+        origin = (onRight ? 'right' : 'left') + ' bottom';
+    } else if (b.bottom + gap + ph <= H - m) {   // cabe abajo
+        x = onRight ? b.right - pw : b.left; y = b.bottom + gap;
+        origin = (onRight ? 'right' : 'left') + ' top';
+    } else {                                     // al costado de la burbuja
+        x = onRight ? b.left - gap - pw : b.right + gap;
+        y = b.top + b.height / 2 - ph / 2;
+        origin = (onRight ? 'right' : 'left') + ' center';
+    }
+    x = ufocsClamp(x, m, W - pw - m);
+    y = ufocsClamp(y, m, H - ph - m);
+    panel.style.left = x + 'px';
+    panel.style.top = y + 'px';
+    panel.style.transformOrigin = origin;
+}
+
+function ufocsOpenFloatPanel() {
+    const panel = ufocsFloat.panel;
+    panel.classList.remove('closing');
+    panel.classList.add('open');
+    ufocsFloat.panelOpen = true;
+    ufocsFloat.unread = 0;
+    ufocsRenderBadge();
+    ufocsRenderFloatStatus();
+    ufocsPositionPanelNearBubble();
+    scrollChatToBottomIfNeeded(true);
+    setTimeout(() => { const input = document.getElementById('chatInput'); if (input) input.focus(); }, 60);
+}
+
+function ufocsCloseFloatPanel(immediate) {
+    const panel = ufocsFloat.panel;
+    ufocsFloat.panelOpen = false;
+    if (immediate) {
+        panel.classList.remove('open', 'closing');
+        return;
+    }
+    panel.classList.remove('open');
+    panel.classList.add('closing');
+    setTimeout(() => panel.classList.remove('closing'), 200);
+}
+
+function ufocsEnterFloatingChat() {
+    if (ufocsFloat.active) return;
+    const chatView = document.getElementById('chatViewBody');
+    const nodes = [
+        chatView.querySelector('.chat-messages-wrap'),
+        document.getElementById('attachPreviewBar'),
+        document.getElementById('chatForm')
+    ].filter(Boolean);
+    ufocsFloat.moved = nodes.map(node => {
+        const placeholder = document.createComment('ufocs-float-placeholder');
+        node.parentNode.insertBefore(placeholder, node);
+        ufocsFloat.body.appendChild(node);
+        return { node, placeholder };
+    });
+    ufocsFloat.active = true;
+    ufocsFloat.unread = 0;
+    ufocsRenderBadge();
+    ufocsFloat.bubble.classList.add('visible');
+    const r = ufocsFloat.bubble.getBoundingClientRect();
+    ufocsSetBubblePos(r.left, r.top);
+}
+
+function ufocsExitFloatingChat() {
+    if (!ufocsFloat.active) return;
+    ufocsCloseFloatPanel(true);
+    ufocsFloat.moved.forEach(({ node, placeholder }) => {
+        if (placeholder.parentNode) {
+            placeholder.parentNode.insertBefore(node, placeholder);
+            placeholder.remove();
+        }
+    });
+    ufocsFloat.moved = [];
+    ufocsFloat.active = false;
+    ufocsFloat.bubble.classList.remove('visible');
+    setTimeout(() => scrollChatToBottomIfNeeded(true), 30);
 }
 
 // ============================================================
