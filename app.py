@@ -29,7 +29,7 @@ except Exception:
 
 app = Flask(__name__, static_folder=None)
 
-HTML_FILENAME = "UFOCS_con_mejoras_mas_actual.html"
+HTML_FILENAME = "UFOCS_APP.html"
 
 # ============================================================
 # Configuración de Groq (API Key y Cliente OpenAI compatible)
